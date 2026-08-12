@@ -19,8 +19,19 @@ for item in products:
     detail = json.loads(path.read_text(encoding="utf-8"))
     assert set(detail["frameworks"]) == {"ari", "chan", "macd", "gann"}
     assert detail["decision"].get("confidence") in {"完整多周期", "降级观察"}
+fundamentals = json.loads((SITE / "data" / "fundamentals.json").read_text(encoding="utf-8"))
+focus = fundamentals.get("products") or []
+assert fundamentals.get("coverage") == {"total": 77, "covered": 8}
+assert len(focus) == 77
+covered = [item for item in focus if item.get("covered")]
+assert {item["symbol"] for item in covered} == {"AL", "CU", "PB", "ZN", "NI", "SN", "LC", "SI"}
+assert all(len(item.get("metrics") or []) == 3 for item in covered)
+fundamental_raw = json.dumps(fundamentals, ensure_ascii=False)
+assert '"score"' not in fundamental_raw
+assert '"consistency"' not in fundamental_raw
+assert "fundamentalCard" in (SITE / "index.html").read_text(encoding="utf-8")
 for path in SITE.rglob("*"):
     if path.is_file() and path.suffix.lower() in {".html", ".js", ".css", ".json", ".md", ".txt"}:
         assert "wk_" not in path.read_text(encoding="utf-8", errors="ignore"), path
 assert (SITE / "assets" / "abyss-voyage-cover.png").stat().st_size > 100_000
-print("site verification: 77/77 products, four frameworks, cover and secret scan OK")
+print("site verification: 77/77 technical, 8 concise fundamentals, cover and secret scan OK")

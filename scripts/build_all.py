@@ -15,6 +15,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 import engine  # noqa: E402
+from build_fundamentals import build as build_fundamentals  # noqa: E402
 
 DATA_DIR = ROOT / "data"
 SYMBOL_DIR = DATA_DIR / "symbols"
@@ -221,6 +222,7 @@ def main() -> None:
         "method": "Ari 30% + 缠论 25% + MACD 25% + 江恩 20%；方向看日线与60分钟，15分钟仅作入场确认",
     }
     atomic_json(DATA_DIR / "market.json", market)
+    build_fundamentals(max(1, min(args.workers, 8)))
     if not args.no_site:
         materialize_site()
         security_scan(SITE_DIR)
