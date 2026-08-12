@@ -3,7 +3,10 @@ name: Refresh futures snapshots and deploy Pages
 on:
   workflow_dispatch:
   schedule:
-    - cron: "13 1,5,7 * * 1-5"
+    # Beijing 08:00-23:59, weekdays: refresh the public market snapshot every 15 minutes.
+    - cron: "*/15 0-15 * * 1-5"
+    # Beijing 00:20, Tuesday-Saturday: rebuild all technical/fundamental snapshots in maintenance hours.
+    - cron: "20 16 * * 1-5"
   push:
     branches: [main]
 
@@ -19,7 +22,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -29,9 +32,16 @@ jobs:
         with:
           python-version: "3.12"
       - name: Build 77-product snapshots
+        if: github.event_name != 'schedule' || github.event.schedule == '20 16 * * 1-5'
         env:
           ZHIJI_GUAN_KEY: ${{ secrets.ZHIJI_GUAN_KEY }}
-        run: python scripts/build_all.py --workers 6
+        run: python scripts/build_all.py --workers 8
+
+      - name: Refresh live quotes
+        if: github.event_name == 'schedule' && github.event.schedule == '*/15 0-15 * * 1-5'
+        env:
+          ZHIJI_GUAN_KEY: ${{ secrets.ZHIJI_GUAN_KEY }}
+        run: python scripts/refresh_quotes.py
       - name: Verify static output
         run: python scripts/verify_site.py
       - uses: actions/configure-pages@v5
