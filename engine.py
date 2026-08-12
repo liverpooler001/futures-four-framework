@@ -11,6 +11,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import threading
 import time
 import webbrowser
@@ -206,6 +207,62 @@ def get_bars(symbol: str, freq: str, limit: int, ttl: float) -> list[dict[str, A
     return bars
 
 
+def get_sina_intraday(symbol: str, freq: str, limit: int, ttl: float) -> list[dict[str, Any]]:
+    """Fetch real 15/60 minute bars when the primary endpoint is unavailable."""
+    cache_key = f"sina:{symbol}:{freq}:{limit}"
+
+    def fetch() -> list[dict[str, Any]]:
+        url = (
+            "https://stock2.finance.sina.com.cn/futures/api/jsonp.php/var%20_YAFCO=/"
+            "InnerFuturesNewService.getFewMinLine?"
+            + urlencode({"symbol": f"{symbol.upper()}0", "type": freq})
+        )
+        request = Request(
+            url,
+            headers={
+                "Referer": "https://finance.sina.com.cn/",
+                "User-Agent": "YAFCO-Futures-Decision-Dashboard/1.1",
+            },
+        )
+        last_error: Exception | None = None
+        for attempt in range(3):
+            try:
+                with urlopen(request, timeout=20) as response:
+                    text = response.read().decode("utf-8", errors="replace")
+                match = re.search(r"\((\[.*\])\)", text, re.S)
+                if not match:
+                    raise DashboardError("新浪分钟线返回格式异常")
+                raw = json.loads(match.group(1))
+                bars = [
+                    {
+                        "time": str(item.get("d") or ""),
+                        "open": finite(item.get("o")),
+                        "high": finite(item.get("h")),
+                        "low": finite(item.get("l")),
+                        "close": finite(item.get("c")),
+                        "volume": finite(item.get("v"), 0.0),
+                        "open_interest": finite(item.get("p")),
+                        "settle": None,
+                    }
+                    for item in raw
+                ]
+                bars = [
+                    bar
+                    for bar in bars
+                    if bar["time"] and None not in (bar["open"], bar["high"], bar["low"], bar["close"])
+                ]
+                bars.sort(key=lambda item: item["time"])
+                if len(bars) < 30 or ":" not in bars[-1]["time"]:
+                    raise DashboardError(f"新浪 {freq} 分钟K线不足或周期异常")
+                return bars[-limit:]
+            except Exception as error:  # noqa: BLE001
+                last_error = error
+                time.sleep(1.5 * (attempt + 1))
+        raise DashboardError(f"新浪 {freq} 分钟线暂不可用：{last_error}")
+
+    return CACHE.get_or_set(cache_key, ttl, fetch)
+
+
 def merge_live_daily(
     daily: list[dict[str, Any]], intraday: list[dict[str, Any]], quote: dict[str, Any]
 ) -> list[dict[str, Any]]:
@@ -264,6 +321,8 @@ def merge_live_weekly(weekly: list[dict[str, Any]], daily: list[dict[str, Any]])
             merged[-1] = live
         else:
             merged.append(live)
+    else:
+        merged.append(live)
     return merged
 
 
@@ -518,8 +577,8 @@ def chan_analysis(bars: list[dict[str, Any]], metrics: dict[str, Any]) -> dict[s
 
 
 def ari_analysis(frames: dict[str, dict[str, Any]]) -> dict[str, Any]:
-    daily, hourly, minute = frames["D"], frames["60"], frames["15"]
-    score = daily["score"] * 0.6 + hourly["score"] * 0.3 + minute["score"] * 0.1
+    weekly, daily, hourly, minute = frames["W"], frames["D"], frames["60"], frames["15"]
+    score = weekly["score"] * 0.25 + daily["score"] * 0.45 + hourly["score"] * 0.20 + minute["score"] * 0.10
     above_line = daily["price"] >= daily["ma20"]
     if score >= 1.5 and above_line:
         environment, tone = "GREEN · 多头主场", "up"
@@ -545,6 +604,7 @@ def ari_analysis(frames: dict[str, dict[str, Any]]) -> dict[str, Any]:
         "line": daily["ma20"],
         "line_relation": "多空线上方" if above_line else "多空线下方",
         "momentum": momentum,
+        "rsiW": weekly["rsi"],
         "rsi15": minute["rsi"],
         "rsi60": hourly["rsi"],
         "rsiD": daily["rsi"],
@@ -553,10 +613,10 @@ def ari_analysis(frames: dict[str, dict[str, Any]]) -> dict[str, Any]:
 
 
 def macd_framework(frames: dict[str, dict[str, Any]]) -> dict[str, Any]:
-    weights = {"D": 0.5, "60": 0.3, "15": 0.2}
+    weights = {"W": 0.25, "D": 0.40, "60": 0.25, "15": 0.10}
     score = 0.0
     details = []
-    for key in ("D", "60", "15"):
+    for key in ("W", "D", "60", "15"):
         frame = frames[key]
         part = (1.5 if frame["hist"] >= 0 else -1.5) + (
             0.5 if frame["hist"] >= frame["hist_prev"] else -0.5
@@ -580,7 +640,12 @@ def macd_framework(frames: dict[str, dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def gann_analysis(bars: list[dict[str, Any]], metrics: dict[str, Any], tick: float) -> dict[str, Any]:
+def gann_analysis(
+    bars: list[dict[str, Any]],
+    metrics: dict[str, Any],
+    tick: float,
+    frame_label: str = "日",
+) -> dict[str, Any]:
     lookback = bars[-120:] if len(bars) >= 120 else bars
     low_index = min(range(len(lookback)), key=lambda i: lookback[i]["low"])
     high_index = max(range(len(lookback)), key=lambda i: lookback[i]["high"])
@@ -619,9 +684,46 @@ def gann_analysis(bars: list[dict[str, Any]], metrics: dict[str, Any], tick: flo
         "position_eighth": round(position * 8, 2),
         "line_1x1": line_1x1,
         "line_relation": "1×1线上方" if price >= line_1x1 else "1×1线下方",
-        "next_time_window": None if next_window is None else f"锚点后第 {next_window} 根日K附近",
-        "note": "近120根日K有效摆动区间；八分位与1×1速度线",
+        "next_time_window": None if next_window is None else f"锚点后第 {next_window} 根{frame_label}K附近",
+        "note": f"近120根{frame_label}K有效摆动区间；八分位与1×1速度线",
     }
+
+
+TIMEFRAME_LABELS = {"W": "周线", "D": "日线", "60": "60分钟", "15": "15分钟"}
+TIMEFRAME_HORIZONS = {
+    "W": "中期 · 数周至数月",
+    "D": "波段 · 数日至数周",
+    "60": "短波段 · 1—5个交易日",
+    "15": "短线 · 日内至2日",
+}
+
+
+def single_timeframe_frameworks(
+    frame_key: str,
+    bars: list[dict[str, Any]],
+    metrics: dict[str, Any],
+    tick: float,
+) -> dict[str, dict[str, Any]]:
+    """Run all four frameworks on one timeframe for an independent route plan."""
+    score = metrics["score"]
+    above_line = metrics["price"] >= metrics["ma20"]
+    ari = {
+        "score": round(score, 2),
+        "tone": "up" if score >= 1.5 and above_line else ("down" if score <= -1.5 and not above_line else "neutral"),
+        "line": metrics["ma20"],
+        "rsi": metrics["rsi"],
+    }
+    chan = chan_analysis(bars, metrics)
+    macd_score = (1.5 if metrics["hist"] >= 0 else -1.5) + (
+        0.5 if metrics["hist"] >= metrics["hist_prev"] else -0.5
+    )
+    macd = {
+        "score": round(macd_score, 2),
+        "tone": "up" if macd_score >= 0.8 else ("down" if macd_score <= -0.8 else "neutral"),
+        "state": metrics["macd_state"],
+    }
+    gann = gann_analysis(bars, metrics, tick, TIMEFRAME_LABELS[frame_key].replace("线", ""))
+    return {"ari": ari, "chan": chan, "macd": macd, "gann": gann}
 
 
 def unique_levels(values: list[float | None], price: float, threshold: float) -> list[float]:
@@ -739,6 +841,124 @@ def decision_plan(
     }
 
 
+def timeframe_decision_plan(
+    product: dict[str, Any],
+    quote: dict[str, Any],
+    frame_key: str,
+    metrics: dict[str, Any],
+    local_frameworks: dict[str, dict[str, Any]],
+    quality: dict[str, Any],
+) -> dict[str, Any]:
+    """Build an executable route from one timeframe only."""
+    price = finite(quote.get("last"), metrics["price"]) or metrics["price"]
+    tick = finite(product.get("tick"), 1.0) or 1.0
+    atr = max(metrics["atr"], tick * 8)
+    label = TIMEFRAME_LABELS[frame_key]
+    chan = local_frameworks["chan"]
+    gann = local_frameworks["gann"]
+    pivots = chan.get("pivots") or []
+    candidates: list[float | None] = [
+        metrics["ma5"], metrics["ma10"], metrics["ma20"], metrics["ma60"],
+        metrics["range_low"], metrics["range_high"],
+        gann["support"], gann["resistance"], *gann["levels"],
+        *(point["price"] for point in pivots),
+    ]
+    if chan.get("zone"):
+        candidates.extend([chan["zone"]["low"], chan["zone"]["high"]])
+    threshold = max(tick * 3, atr * 0.15, price * 0.0008)
+    levels = unique_levels(candidates, price, threshold)
+    supports = [value for value in levels if value < price - tick]
+    resistances = [value for value in levels if value > price + tick]
+    support1 = supports[-1] if supports else price - atr
+    support2 = supports[-2] if len(supports) >= 2 else support1 - atr * 0.8
+    resistance1 = resistances[0] if resistances else price + atr
+    resistance2 = resistances[1] if len(resistances) >= 2 else resistance1 + atr * 0.8
+    buffer_ratio = {"W": 0.10, "D": 0.09, "60": 0.08, "15": 0.07}[frame_key]
+    stop_ratio = {"W": 0.72, "D": 0.62, "60": 0.54, "15": 0.46}[frame_key]
+    buffer = max(tick * 2, round_tick(atr * buffer_ratio, tick, "up"))
+    width = max(tick * 2, round_tick(atr * (buffer_ratio + 0.03), tick, "up"))
+    long_trigger = round_tick(resistance1 + buffer, tick, "up")
+    short_trigger = round_tick(support1 - buffer, tick, "down")
+    long_entry_low = round_tick(resistance1 - width, tick, "down")
+    long_entry_high = round_tick(resistance1 + width, tick, "up")
+    short_entry_low = round_tick(support1 - width, tick, "down")
+    short_entry_high = round_tick(support1 + width, tick, "up")
+    long_stop = round_tick(min(support1 - buffer, long_entry_low - atr * stop_ratio), tick, "down")
+    short_stop = round_tick(max(resistance1 + buffer, short_entry_high + atr * stop_ratio), tick, "up")
+    long_risk = max(long_entry_high - long_stop, tick * 2)
+    short_risk = max(short_stop - short_entry_low, tick * 2)
+    long_target1 = round_tick(max(resistance2, long_entry_high + long_risk * 1.3), tick, "up")
+    long_target2 = round_tick(long_entry_high + long_risk * 2.2, tick, "up")
+    short_target1 = round_tick(min(support2, short_entry_low - short_risk * 1.3), tick, "down")
+    short_target2 = round_tick(short_entry_low - short_risk * 2.2, tick, "down")
+    composite = (
+        local_frameworks["ari"]["score"] * 0.30
+        + local_frameworks["chan"]["score"] * 0.25
+        + local_frameworks["macd"]["score"] * 0.25
+        + local_frameworks["gann"]["score"] * 0.20
+    )
+    bias, tone = (
+        ("偏多", "up") if composite >= 1.2
+        else (("偏空", "down") if composite <= -1.2 else ("震荡/等待", "neutral"))
+    )
+    long_priority = "优先观察" if composite > 0 else "次选"
+    short_priority = "优先观察" if composite < 0 else "次选"
+    rsi = metrics["rsi"] or 50
+    if rsi >= 72:
+        long_priority = "不追价·等回踩"
+    if rsi <= 28:
+        short_priority = "不追价·等反抽"
+    proxy = quality.get("mode") == "daily_proxy"
+    confirmation = {
+        "W": "只用周线收盘确认；仓位更轻，允许更宽止损",
+        "D": "突破不是买卖点本身；等日线收盘与回踩/反抽确认",
+        "60": "等待本级别收盘确认，不用盘中刺穿代替信号",
+        "15": "仅作短线执行；不把15分钟信号当中期方向",
+    }[frame_key]
+    qualifier = "代理条件：" if proxy else ""
+    mult = finite(product.get("mult"), 1.0) or 1.0
+    return {
+        "frame": frame_key,
+        "label": label,
+        "horizon": TIMEFRAME_HORIZONS[frame_key],
+        "score": round(composite, 2),
+        "bias": bias,
+        "tone": tone,
+        "support": [round_tick(support1, tick), round_tick(support2, tick)],
+        "resistance": [round_tick(resistance1, tick), round_tick(resistance2, tick)],
+        "long": {
+            "priority": long_priority,
+            "status": "已触发待回踩" if price >= long_trigger else "未触发",
+            "trigger": long_trigger,
+            "trigger_text": f"{label}{qualifier}收盘站上 {format_price(long_trigger, tick)}，随后回踩不破",
+            "entry": [long_entry_low, long_entry_high],
+            "stop": long_stop,
+            "targets": [long_target1, long_target2],
+            "invalid": f"{label}重新跌破 {format_price(long_stop, tick)}",
+            "confirmation": confirmation,
+        },
+        "short": {
+            "priority": short_priority,
+            "status": "已触发待反抽" if price <= short_trigger else "未触发",
+            "trigger": short_trigger,
+            "trigger_text": f"{label}{qualifier}收盘跌破 {format_price(short_trigger, tick)}，随后反抽不过",
+            "entry": [short_entry_low, short_entry_high],
+            "stop": short_stop,
+            "targets": [short_target1, short_target2],
+            "invalid": f"{label}重新站上 {format_price(short_stop, tick)}",
+            "confirmation": confirmation,
+        },
+        "risk": {
+            "multiplier": mult,
+            "tick": tick,
+            "long_risk_per_lot": abs(((long_entry_low + long_entry_high) / 2 - long_stop) * mult),
+            "short_risk_per_lot": abs((short_stop - (short_entry_low + short_entry_high) / 2) * mult),
+        },
+        "confidence": "代理观察" if proxy else "本级别有效",
+        "quality_note": quality.get("label") or "数据状态未知",
+    }
+
+
 def format_price(value: float, tick: float) -> str:
     decimals = max(0, min(4, len(str(tick).split(".")[1].rstrip("0")) if "." in str(tick) else 0))
     return f"{value:,.{decimals}f}"
@@ -759,10 +979,13 @@ def chart_payload(bars: list[dict[str, Any]], limit: int) -> dict[str, Any]:
 def curve_quotes(product_code: str, lead_symbol: str) -> list[dict[str, Any]]:
     now = datetime.now()
     candidates: list[str] = []
-    for offset in range(-1, 13):
+    lead_digits = "".join(char for char in str(lead_symbol) if char.isdigit())
+    contract_width = 3 if len(lead_digits) == 3 else 4
+    for offset in range(-2, 16):
         month_index = now.year * 12 + now.month - 1 + offset
         year, month_zero = divmod(month_index, 12)
-        candidates.append(f"{product_code.lower()}{str(year)[-2:]}{month_zero + 1:02d}")
+        year_code = str(year)[-1:] if contract_width == 3 else str(year)[-2:]
+        candidates.append(f"{product_code.lower()}{year_code}{month_zero + 1:02d}")
     if lead_symbol:
         candidates.insert(0, lead_symbol.lower())
     unique = list(dict.fromkeys(candidates))
@@ -810,23 +1033,46 @@ def build_dashboard(
     else:
         quote = quote_override
     frame_errors: dict[str, str] = {}
+    frame_sources: dict[str, str] = {"D": "知几·观"}
+
+    def optional_weekly() -> list[dict[str, Any]] | None:
+        try:
+            result = get_bars(symbol, "W", 300, 900)
+            frame_sources["W"] = "知几·观"
+            return result
+        except DashboardError as exc:
+            frame_errors["W"] = str(exc)
+            return None
 
     def optional_intraday(freq: str, ttl: float) -> list[dict[str, Any]] | None:
         if force_daily_proxy:
             frame_errors[freq] = "静态构建安全模式：分钟源待恢复"
             return None
         try:
-            return get_bars(symbol, freq, 300, ttl)
+            result = get_bars(symbol, freq, 300, ttl)
+            if not any(":" in str(bar.get("time") or "") for bar in result[-5:]):
+                raise DashboardError(f"上游周期串线：{freq}分钟返回了日线")
+            frame_sources[freq] = "知几·观"
+            return result
         except DashboardError as exc:
-            frame_errors[freq] = str(exc)
+            primary_error = str(exc)
+        try:
+            result = get_sina_intraday(symbol, freq, 300, ttl)
+            frame_sources[freq] = "新浪分钟线"
+            frame_errors[freq] = f"知几分钟线降级：{primary_error}"
+            return result
+        except DashboardError as exc:
+            frame_errors[freq] = f"知几：{primary_error}；新浪：{exc}"
             return None
 
-    with ThreadPoolExecutor(max_workers=3) as executor:
+    with ThreadPoolExecutor(max_workers=4) as executor:
         futures = {
-            'D': executor.submit(get_bars, symbol, 'D', 300, 240),
+            'W': executor.submit(optional_weekly),
+            'D': executor.submit(get_bars, symbol, 'D', 500, 240),
             '60': executor.submit(optional_intraday, '60', 25),
             '15': executor.submit(optional_intraday, '15', 20),
         }
+        weekly_raw = futures['W'].result()
         daily_raw = futures['D'].result()
         hourly_raw = futures['60'].result()
         minute_raw = futures['15'].result()
@@ -839,17 +1085,20 @@ def build_dashboard(
     daily = merge_live_daily(daily_raw, minute_raw or [], quote)
     hourly = hourly_raw or daily_proxy_frame(daily, "60")
     minute = minute_raw or daily_proxy_frame(daily, "15")
-    weekly = resample_daily_to_weekly(daily)
+    weekly = merge_live_weekly(weekly_raw or resample_daily_to_weekly(daily), daily)
     bars = {"D": daily, "W": weekly, "60": hourly, "15": minute}
     frames = {key: frame_metrics(key, bars[key]) for key in ("W", "D", "60", "15")}
+    tick = finite(product.get("tick"), 1.0) or 1.0
+    chan_w = chan_analysis(weekly, frames["W"])
     chan_d = chan_analysis(daily, frames["D"])
     chan_60 = chan_analysis(hourly, frames["60"])
     chan_15 = chan_analysis(minute, frames["15"])
-    chan_score = chan_d["score"] * 0.55 + chan_60["score"] * 0.30 + chan_15["score"] * 0.15
+    chan_score = chan_w["score"] * 0.25 + chan_d["score"] * 0.40 + chan_60["score"] * 0.25 + chan_15["score"] * 0.10
     chan = dict(chan_d)
     chan["score"] = round(chan_score, 2)
     chan["tone"] = "up" if chan_score >= 1 else ("down" if chan_score <= -1 else "neutral")
     chan["frames"] = {
+        "W": {key: chan_w[key] for key in ("last_pen", "structure", "divergence", "signal")},
         "D": {key: chan_d[key] for key in ("last_pen", "structure", "divergence", "signal")},
         "60": {key: chan_60[key] for key in ("last_pen", "structure", "divergence", "signal")},
         "15": {key: chan_15[key] for key in ("last_pen", "structure", "divergence", "signal")},
@@ -858,20 +1107,29 @@ def build_dashboard(
         "ari": ari_analysis(frames),
         "chan": chan,
         "macd": macd_framework(frames),
-        "gann": gann_analysis(daily, frames["D"], finite(product.get("tick"), 1.0) or 1.0),
+        "gann": gann_analysis(daily, frames["D"], tick),
     }
     decision = decision_plan(product, quote, frames, frameworks, bars)
     data_quality = {
+        "W": {
+            "mode": "official" if weekly_raw else "derived_official",
+            "label": "真实周线" if weekly_raw else "真实日线聚合周线",
+            "source": frame_sources.get("W", "知几·观日线"),
+            "bars": len(weekly),
+            "error": frame_errors.get("W"),
+        },
         "D": {"mode": "official", "label": "真实日线", "bars": len(daily)},
         "60": {
             "mode": "official" if hourly_raw else "daily_proxy",
-            "label": "真实60分钟" if hourly_raw else "日线代理·60分钟待恢复",
+            "label": f"真实60分钟 · {frame_sources.get('60')}" if hourly_raw else "日线代理·60分钟待恢复",
+            "source": frame_sources.get("60", "知几·观日线"),
             "bars": len(hourly),
             "error": frame_errors.get("60"),
         },
         "15": {
             "mode": "official" if minute_raw else "daily_proxy",
-            "label": "真实15分钟" if minute_raw else "日线代理·15分钟待恢复",
+            "label": f"真实15分钟 · {frame_sources.get('15')}" if minute_raw else "日线代理·15分钟待恢复",
+            "source": frame_sources.get("15", "知几·观日线"),
             "bars": len(minute),
             "error": frame_errors.get("15"),
         },
@@ -896,7 +1154,15 @@ def build_dashboard(
         )
     else:
         decision["confidence"] = "完整多周期"
-        decision["quality_note"] = "日线、60分钟、15分钟均为真实行情"
+        decision["quality_note"] = "周线、日线、60分钟、15分钟均为真实行情"
+    local_frameworks = {
+        key: single_timeframe_frameworks(key, bars[key], frames[key], tick)
+        for key in ("W", "D", "60", "15")
+    }
+    strategies = {
+        key: timeframe_decision_plan(product, quote, key, frames[key], local_frameworks[key], data_quality[key])
+        for key in ("W", "D", "60", "15")
+    }
     daily_oi = [bar for bar in daily if bar.get("open_interest") is not None]
     oi_change = None
     if len(daily_oi) >= 2:
@@ -910,6 +1176,7 @@ def build_dashboard(
         "frames": frames,
         "frameworks": frameworks,
         "decision": decision,
+        "strategies": strategies,
         "market": {
             "open_interest": finite(quote.get("open_interest")),
             "oi_change": oi_change,
@@ -920,13 +1187,14 @@ def build_dashboard(
             "seat_note": "当前知几只读接口不含交易所会员席位排名，暂无真源，不生成模拟数据。",
         },
         "charts": {
+            "W": chart_payload(weekly, 130),
             "D": chart_payload(daily, 150),
             "60": chart_payload(hourly, 180),
             "15": chart_payload(minute, 180),
         },
         "method": {
             "weights": "综合判断：Ari 30% + 缠论 25% + MACD 25% + 江恩 20%",
-            "timeframes": "方向看日线×60分钟；15分钟只做入场确认",
+            "timeframes": "周、日、60分钟、15分钟各自独立给出条件策略；默认日线",
             "disclaimer": "程序化技术分析属于概率信号，不构成投资建议。",
         },
     }

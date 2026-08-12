@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#071116">
+  <meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests">
   <meta name="description" content="全品种期货四框架技术决策平台：Ari 动量、缠论、MACD 多级别、江恩线。">
   <title>渊行 · 全品种期货四框架</title>
   <link rel="preload" href="assets/abyss-voyage-cover.png" as="image">
@@ -16,6 +19,15 @@
   </style>
 </head>
 <body>
+  <section class="access-gate" id="accessGate" aria-live="polite">
+    <div class="access-box">
+      <span>YAFCO / ACCESS CONTROL</span>
+      <h1 id="accessTitle">校验航行权限</h1>
+      <p id="accessMessage">正在读取北京时间访问窗口……</p>
+      <form id="accessForm" class="hidden" autocomplete="off"><input id="accessPassword" type="password" placeholder="输入当前时段密码" maxlength="32" required><button type="submit">进入渊行</button></form>
+      <small id="accessSchedule">00:00–07:59 维护 · 08:00–08:59 开放 · 09:00–15:59 / 16:00–23:59 分时鉴权</small>
+    </div>
+  </section>
   <section class="cover" id="cover">
     <div class="cover-image"></div><div class="cover-vignette"></div><div class="cover-grid"></div>
     <nav class="cover-nav"><a class="identity" href="#cover"><i>Y</i><span>YAFCO / ABYSSAL NAVIGATION</span></a><div><span id="coverStatus">等待数据链路</span><span class="live-signal"></span></div></nav>
@@ -25,7 +37,7 @@
       <p>越过价格表面，向结构深处航行。<br>Ari 动量 · 缠论 · MACD 多级别 · 江恩线</p>
       <div class="cover-actions"><a class="enter-button" href="#market"><span>进入全市场雷达</span><b>↓</b></a><button id="coverRandom">随机探索一个品种</button></div>
     </div>
-    <div class="cover-meta"><div><span>覆盖品种</span><b id="coverCount">—</b></div><div><span>数据状态</span><b id="coverFresh">—</b></div><div><span>决策口径</span><b>D × 60m × 15m</b></div></div>
+    <div class="cover-meta"><div><span>覆盖品种</span><b id="coverCount">—</b></div><div><span>数据状态</span><b id="coverFresh">—</b></div><div><span>决策口径</span><b>W × D × 60m × 15m</b></div></div>
     <div class="depth-scale"><span>0m</span><i></i><span>−4,782m</span><i></i><span>ABYSS</span></div>
   </section>
 
@@ -68,7 +80,7 @@
         </div>
         <div class="detail-layout">
           <div class="detail-main">
-            <article class="chart-panel dark-panel"><header><div><span>PRICE STRUCTURE</span><h3>价格结构航迹</h3></div><div class="chart-tabs" id="chartTabs"><button data-frame="D" class="active">日线</button><button data-frame="60">60分钟</button><button data-frame="15">15分钟</button></div></header><div id="priceChart" class="price-chart"></div><div class="chart-legend"><span class="up">上涨</span><span class="down">下跌</span><span class="ma5">MA5</span><span class="ma20">MA20</span><span class="ma60">MA60</span></div></article>
+            <article class="chart-panel dark-panel"><header><div><span>PRICE STRUCTURE</span><h3>价格结构航迹</h3></div><div class="chart-tabs" id="chartTabs"><button data-frame="W">周线</button><button data-frame="D" class="active">日线</button><button data-frame="60">60分钟</button><button data-frame="15">15分钟</button></div></header><div id="priceChart" class="price-chart"></div><div class="chart-legend"><span class="up">上涨</span><span class="down">下跌</span><span class="ma5">MA5</span><span class="ma20">MA20</span><span class="ma60">MA60</span></div></article>
             <div class="framework-grid">
               <article class="framework-card" id="ariCard"><header><i>A</i><div><span>ARI MOMENTUM</span><h3>Ari 动量环境</h3></div><b id="ariTone">—</b></header><strong id="ariScore">—</strong><dl id="ariDetail"></dl></article>
               <article class="framework-card" id="chanCard"><header><i>缠</i><div><span>CHAN STRUCTURE</span><h3>缠论结构</h3></div><b id="chanTone">—</b></header><strong id="chanScore">—</strong><dl id="chanDetail"></dl></article>
@@ -77,9 +89,10 @@
             </div>
           </div>
           <aside class="decision-rail">
+            <article class="strategy-switch dark-panel"><header><div><span>STRATEGY TIMEFRAME</span><h3 id="strategyHorizon">日线 · 波段</h3></div><small id="strategyQuality">默认日线</small></header><div class="chart-tabs" id="strategyTabs"><button data-frame="W">周线</button><button data-frame="D" class="active">日线</button><button data-frame="60">60分钟</button><button data-frame="15">15分钟</button></div></article>
             <article class="decision-card long-card"><header><span>LONG ROUTE</span><b id="longPriority">—</b></header><h3>做多航线</h3><p id="longTrigger">—</p><dl id="longDetail"></dl><small id="longConfirm">—</small></article>
             <article class="decision-card short-card"><header><span>SHORT ROUTE</span><b id="shortPriority">—</b></header><h3>做空航线</h3><p id="shortTrigger">—</p><dl id="shortDetail"></dl><small id="shortConfirm">—</small></article>
-            <article class="fundamental-card dark-panel hidden" id="fundamentalCard"><header><div><span>FUNDAMENTAL FOCUS</span><h3>基本面主要矛盾</h3></div></header><p id="fundamentalThesis">—</p><div class="fundamental-metrics" id="fundamentalMetrics"></div><a class="fundamental-link" id="fundamentalLink" href="#" target="_blank" rel="noopener">进入完整基本面框架 <b>↗</b></a></article>
+            <article class="fundamental-card dark-panel hidden" id="fundamentalCard"><header><div><span>FUNDAMENTAL FOCUS</span><h3 id="fundamentalTitle">基本面主要矛盾</h3></div></header><p id="fundamentalThesis">—</p><div class="fundamental-metrics" id="fundamentalMetrics"></div><a class="fundamental-link" id="fundamentalLink" href="#" target="_blank" rel="noopener">进入完整基本面框架 <b>↗</b></a></article>
             <article class="levels-card dark-panel"><header><span>DEPTH MARKERS</span><h3>关键深度标尺</h3></header><div id="levelMap"></div></article>
             <article class="truth-card dark-panel"><header><span>DATA PROVENANCE</span><h3>数据真源</h3></header><p id="truthNote">—</p><div><span>持仓量</span><b id="truthOi">—</b></div><div><span>成交量</span><b id="truthVolume">—</b></div></article>
           </aside>
@@ -87,11 +100,13 @@
       </div>
     </section>
 
-    <section class="method section" id="method"><div class="section-kicker"><span>03</span><b>METHODOLOGY &amp; PROVENANCE</b></div><div class="method-grid"><article><span>01 / Ari</span><h3>先判断在哪个主场</h3><p>日线 MA20 为多空线，日线、60分钟与15分钟共同确认趋势和动量；过渡区不重仓，短周期过热不追价。</p></article><article><span>02 / 缠论</span><h3>再看结构走到了哪里</h3><p>程序化识别分型、笔、连续三笔重叠中枢与疑似背驰；所有信号明确标注为简化口径。</p></article><article><span>03 / MACD</span><h3>检查多级别是否共振</h3><p>日线决定方向，60分钟确认推进，15分钟只负责入场；观察零轴、交叉和柱体增强/减弱。</p></article><article><span>04 / 江恩</span><h3>给航线装上标尺</h3><p>用近120根日K有效摆动计算八分位、1×1速度线与时间窗口，形成支撑、阻力和失效边界。</p></article></div><div class="provenance"><p>数据由知几「观」API 提供，GitHub Actions 构建为静态快照。密钥只存在于仓库 Secret，不进入浏览器或发布文件。</p><p>当前接口没有交易所会员席位排名：网站明确留空，绝不生成模拟席位。程序化技术分析属于概率信号，不构成投资建议。</p></div></section>
+    <section class="method section" id="method"><div class="section-kicker"><span>03</span><b>METHODOLOGY &amp; PROVENANCE</b></div><div class="method-grid"><article><span>01 / Ari</span><h3>先判断在哪个主场</h3><p>周线、日线、60分钟与15分钟共同确认趋势和动量；各级别策略独立计算，默认查看日线。</p></article><article><span>02 / 缠论</span><h3>再看结构走到了哪里</h3><p>程序化识别分型、笔、连续三笔重叠中枢与疑似背驰；所有信号明确标注为简化口径。</p></article><article><span>03 / MACD</span><h3>检查多级别是否共振</h3><p>周线定中期背景，日线看波段，60与15分钟负责更短周期执行；观察零轴、交叉与柱体强弱。</p></article><article><span>04 / 江恩</span><h3>给航线装上标尺</h3><p>每个级别分别用近120根K线摆动计算八分位、1×1速度线与时间窗口，形成各自失效边界。</p></article></div><div class="provenance"><p>数据由知几「观」API 提供，GitHub Actions 构建为静态快照。密钥只存在于仓库 Secret，不进入浏览器或发布文件。</p><p>当前接口没有交易所会员席位排名：网站明确留空，绝不生成模拟席位。程序化技术分析属于概率信号，不构成投资建议。</p></div></section>
+    <section class="macro section" id="macro"><div class="section-kicker"><span>04</span><b>LATEST MACRO RELEASE</b></div><div class="section-title"><div><h2>宏观落地快报</h2><p>只保留当前最新、最重要的一条数据或新闻。</p></div><div class="build-state" id="macroTime">—</div></div><article class="macro-card dark-panel"><header><div><span id="macroStance">—</span><h3 id="macroTitle">载入中</h3></div><small id="macroVerify">—</small></header><p id="macroConclusion">—</p><div class="macro-metrics" id="macroMetrics"></div><div class="macro-grid"><section><h4>资产传导</h4><div id="macroTransmission"></div></section><section><h4>下一验证节点</h4><div id="macroNext"></div></section></div><footer id="macroSources"></footer></article></section>
   </main>
   <footer><a class="identity" href="#cover"><i>Y</i><span>渊行 / ABYSSAL NAVIGATION</span></a><p>越过价格表面，向结构深处航行。</p><span id="footerUpdated">—</span></footer>
   <div class="loading-screen" id="loadingScreen"><div class="sonar"><i></i></div><span>建立全市场数据链路</span></div>
   <div class="toast" id="toast"></div>
+  <script src="auth.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

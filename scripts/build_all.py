@@ -115,7 +115,7 @@ def materialize_site() -> None:
     if SITE_DIR.exists():
         shutil.rmtree(SITE_DIR)
     SITE_DIR.mkdir(parents=True)
-    for name in ("index.html", "app.js", "styles.css", "404.html", ".nojekyll"):
+    for name in ("index.html", "app.js", "auth.js", "styles.css", "robots.txt", "404.html", ".nojekyll"):
         source = ROOT / name
         if source.exists():
             shutil.copy2(source, SITE_DIR / name)

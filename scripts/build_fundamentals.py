@@ -10,12 +10,15 @@ import statistics
 import time
 import urllib.parse
 import urllib.request
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+import engine  # noqa: E402
 OUTPUT = ROOT / "data" / "fundamentals.json"
 CACHE = ROOT / "cache" / "fundamentals"
 API = "https://zhiji-ai.xyz/commodity/api"
@@ -56,6 +59,12 @@ FOCUS: dict[str, dict[str, Any]] = {
         ("ID01448337", "中国工业硅产量", "吨", "Mysteel", "供应是否真实收缩"),
         ("a12811428", "下游工业硅原料库存", "万吨", "SMM", "下游是否开始补库")]},
 }
+
+NON_PHYSICAL_SECTORS = {"金融", "其他"}
+NON_PHYSICAL_SYMBOLS = {"ZC"}
+SEARCH_ALIASES = {"AG":"白银","AU":"黄金","PD":"钯","PT":"铂","HC":"热轧板卷","I":"铁矿石","J":"焦炭","JM":"焦煤","RB":"螺纹钢","SF":"硅铁","SM":"锰硅","WR":"线材","BR":"丁二烯橡胶","BU":"沥青","BZ":"纯苯","EB":"苯乙烯","EG":"乙二醇","FG":"玻璃","FU":"燃料油","L":"聚乙烯","LU":"低硫燃料油","MA":"甲醇","PF":"短纤","PG":"液化气","PL":"丙烯","PP":"聚丙烯","PR":"瓶片","PX":"对二甲苯","SA":"纯碱","SC":"原油","SH":"烧碱","TA":"PTA","UR":"尿素","V":"PVC","A":"豆一","AP":"苹果","B":"豆二","C":"玉米","CF":"棉花","CJ":"红枣","CS":"玉米淀粉","JD":"鸡蛋","LG":"原木","LH":"生猪","M":"豆粕","NR":"20号胶","OI":"菜油","P":"棕榈油","PK":"花生","RM":"菜粕","RU":"天然橡胶","SP":"纸浆","SR":"白糖","Y":"豆油"}
+INVENTORY_PREFERRED = {"JD":"ID01362852"}
+INVENTORY_CACHE = CACHE / "inventory-map.json"
 
 
 def load_json(path: Path, default: Any) -> Any:
@@ -128,6 +137,72 @@ def fetch_payload(metric_id: str, key: str) -> dict[str, Any]:
     raise RuntimeError(str(last_error))
 
 
+def search_inventory(product: dict[str, Any], key: str) -> dict[str, Any] | None:
+    symbol = str(product.get("symbol") or product.get("product") or "").upper()
+    if product.get("sector") in NON_PHYSICAL_SECTORS or symbol in NON_PHYSICAL_SYMBOLS:
+        return None
+    cached_map = load_json(INVENTORY_CACHE, {})
+    cached = cached_map.get(symbol)
+    if cached and cached.get("id"):
+        return cached
+    query_name = SEARCH_ALIASES.get(symbol) or str(product.get("name") or symbol).removeprefix("沪")
+    if not key:
+        return None
+    url = f"{API}/search?" + urllib.parse.urlencode({"q": f"{query_name} 库存", "source": "all", "limit": 12})
+    request = urllib.request.Request(url, headers={"X-Data-Key": key, "User-Agent": "YAFCO-Inventory-Snapshot/1.0"})
+    try:
+        with urllib.request.urlopen(request, timeout=45) as response:
+            results = json.loads(response.read().decode("utf-8")).get("results") or []
+    except Exception:
+        return cached
+    preferred = INVENTORY_PREFERRED.get(symbol)
+    choice = next((x for x in results if x.get("id") == preferred), None) if preferred else None
+    if not choice:
+        def rank(item: dict[str, Any]) -> float:
+            text = f"{item.get('name','')} {item.get('path','')}"
+            if "库存" not in text or query_name not in text:
+                return -100
+            score = 3 + (4 if any(w in text for w in ("中国","全国","总库存","总量","社会库存")) else 0)
+            score += 2 if any(w in text for w in ("仓单","交易所库存","库存可用天数")) else 0
+            score -= 5 if any(w in text for w in ("省","市","港：","企业：","样本：")) else 0
+            score -= 3 if any(w in text for w in ("原料库存","下游","产成品")) else 0
+            return score
+        ranked = sorted(results, key=rank, reverse=True)
+        choice = ranked[0] if ranked and rank(ranked[0]) >= 3 else None
+    if not choice:
+        return None
+    selected = {"id":choice.get("id"),"name":choice.get("name"),"unit":choice.get("unit") or "","source":str(choice.get("source") or "知几·料").upper(),"path":choice.get("path")}
+    cached_map[symbol] = selected
+    write_json(INVENTORY_CACHE, cached_map)
+    return selected
+
+
+def summarize_inventory(product: dict[str, Any], key: str, previous: dict[str, Any] | None) -> dict[str, Any]:
+    selected = search_inventory(product, key)
+    if not selected:
+        return {"status":"unmatched","latest":None,"name":"库存口径待匹配","source":"知几·料"}
+    result = summarize((selected["id"],selected["name"],selected.get("unit") or "",selected.get("source") or "知几·料","基础库存"), key, previous)
+    result["path"] = selected.get("path")
+    return result
+
+
+def build_spread(product: dict[str, Any]) -> dict[str, Any]:
+    lead = str(product.get("contract") or "")
+    try:
+        curve = engine.curve_quotes(str(product.get("symbol") or ""), lead)
+    except Exception as error:
+        return {"status":"failed","value":None,"error":str(error)[:120]}
+    if not curve:
+        return {"status":"unavailable","value":None}
+    near = next((x for x in curve if x.get("is_lead")), None) or max(curve,key=lambda x:float(x.get("open_interest") or 0))
+    following = [x for x in curve if str(x.get("symbol") or "").upper()>str(near.get("symbol") or "").upper() and (x.get("open_interest") or 0)>0]
+    if not following:
+        return {"status":"no_far_contract","value":None,"near_symbol":str(near.get("symbol") or "").upper()}
+    far = max(following,key=lambda x:(float(x.get("open_interest") or 0),float(x.get("volume") or 0)))
+    value = float(near["last"])-float(far["last"])
+    return {"status":"ok","definition":"主力－下一活跃合约","value":round(value,6),"near_symbol":str(near.get("symbol") or "").upper(),"near_price":near["last"],"far_symbol":str(far.get("symbol") or "").upper(),"far_price":far["last"],"structure":"近强·BACK" if value>0 else ("远强·CONTANGO" if value<0 else "平水"),"source":"知几·观","end":date.today().isoformat()}
+
+
 def summarize(metric: tuple[str, str, str, str, str], key: str, previous: dict[str, Any] | None) -> dict[str, Any]:
     metric_id, name, unit, source, why = metric
     try:
@@ -182,6 +257,7 @@ def build(workers: int) -> dict[str, Any]:
         for item in product.get("metrics") or []
         if item.get("id")
     }
+    old_products = {str(item.get("symbol") or "").upper(): item for item in old.get("products") or []}
     configs = {item[0]: item for config in FOCUS.values() for item in config["metrics"]}
     results: dict[str, dict[str, Any]] = {}
     key = api_key()
@@ -200,24 +276,33 @@ def build(workers: int) -> dict[str, Any]:
         symbol = str(product.get("symbol") or "").upper()
         config = FOCUS.get(symbol)
         if not config:
+            spread = build_spread(product)
+            previous_inventory = (old_products.get(symbol) or {}).get("inventory")
+            inventory = summarize_inventory(product, key, previous_inventory)
+            inventory_ok = inventory.get("latest") is not None
+            spread_ok = spread.get("value") is not None
+            if product.get("sector") in NON_PHYSICAL_SECTORS or symbol in NON_PHYSICAL_SYMBOLS:
+                inventory = {"status":"not_applicable","latest":None,"name":"库存不适用","source":"—"}
             output_products.append({
-                "symbol": symbol, "name": product.get("name"), "covered": False,
-                "contradiction": "基本面待建库；当前仅展示四框架技术结构。",
-                "metrics": [], "library_url": LIBRARY,
+                "symbol": symbol, "name": product.get("name"), "covered": inventory_ok or spread_ok,
+                "kind": "market_snapshot", "summary": "库存验证现货松紧；主力－下一活跃合约验证期限结构。",
+                "inventory": inventory, "spread": spread,
+                "contradiction": "基础实物面快照", "metrics": [], "library_url": LIBRARY,
             })
             continue
         output_products.append({
             "symbol": symbol, "name": product.get("name"), "covered": True,
+            "kind": "focus",
             "contradiction": config["contradiction"],
             "metrics": [results[item[0]] for item in config["metrics"]],
             "library_url": f"{LIBRARY}#/c/{config['route']}",
         })
 
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "updated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "source": "知几·料（SMM/Mysteel 镜像）",
-        "coverage": {"total": len(output_products), "covered": len(FOCUS)},
+        "coverage": {"total": len(output_products), "covered": sum(bool(item.get("covered")) for item in output_products), "focus": len(FOCUS)},
         "products": output_products,
     }
     raw = json.dumps(payload, ensure_ascii=False, allow_nan=False)
