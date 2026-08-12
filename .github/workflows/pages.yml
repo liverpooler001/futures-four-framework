@@ -1,0 +1,43 @@
+name: Refresh futures snapshots and deploy Pages
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "13 1,5,7 * * 1-5"
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build 77-product snapshots
+        env:
+          ZHIJI_GUAN_KEY: ${{ secrets.ZHIJI_GUAN_KEY }}
+        run: python scripts/build_all.py --workers 6
+      - name: Verify static output
+        run: python scripts/verify_site.py
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

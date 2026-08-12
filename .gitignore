@@ -1,0 +1,7 @@
+config.local.json
+cache/
+_site/
+__pycache__/
+*.pyc
+*.log
+
