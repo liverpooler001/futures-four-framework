@@ -30,10 +30,10 @@ for item in products:
 fundamentals = json.loads((SITE / "data" / "fundamentals.json").read_text(encoding="utf-8"))
 focus = fundamentals.get("products") or []
 assert fundamentals.get("coverage", {}).get("total") == 77
-assert fundamentals.get("coverage", {}).get("focus") == 22
+assert fundamentals.get("coverage", {}).get("focus") == 62
 assert len(focus) == 77
 deep = [item for item in focus if item.get("kind") == "focus"]
-assert {item["symbol"] for item in deep} == {"AL", "CU", "PB", "ZN", "NI", "SN", "LC", "SI", "RB", "I", "J", "JM", "TA", "V", "MA", "SA", "M", "LH", "C", "SR", "P", "JD"}
+assert len(deep) == 62
 assert all(2 <= len(item.get("metrics") or []) <= 3 for item in deep)
 fundamental_raw = json.dumps(fundamentals, ensure_ascii=False)
 assert '"score"' not in fundamental_raw

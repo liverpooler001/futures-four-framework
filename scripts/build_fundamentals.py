@@ -118,6 +118,16 @@ FOCUS: dict[str, dict[str, Any]] = {
         ("ID01362852", "鸡蛋库存", "天", "Mysteel", "渠道库存")]},
 }
 
+# 全板块矛盾卡扩展（2026-08-13：能化 20 + 黑色剩余/贵金属 9 + 农产品 11，ID 均经 series 实测）
+try:
+    from _focus_frag_nenghua import FOCUS_FRAG as _FRAG_NH
+    from _focus_frag_blackpm import FOCUS_FRAG as _FRAG_BP
+    from _focus_frag_agri import FOCUS_FRAG as _FRAG_AG
+    for _frag in (_FRAG_NH, _FRAG_BP, _FRAG_AG):
+        FOCUS.update(_frag)
+except ImportError as _e:
+    print(f"[warn] focus 片段未加载: {_e}")
+
 NON_PHYSICAL_SECTORS = {"金融", "其他"}
 NON_PHYSICAL_SYMBOLS = {"ZC"}
 SEARCH_ALIASES = {"AG":"白银","AU":"黄金","PD":"钯","PT":"铂","HC":"热轧板卷","I":"铁矿石","J":"焦炭","JM":"焦煤","RB":"螺纹钢","SF":"硅铁","SM":"锰硅","WR":"线材","BR":"丁二烯橡胶","BU":"沥青","BZ":"纯苯","EB":"苯乙烯","EG":"乙二醇","FG":"玻璃","FU":"燃料油","L":"聚乙烯","LU":"低硫燃料油","MA":"甲醇","PF":"短纤","PG":"液化气","PL":"丙烯","PP":"聚丙烯","PR":"瓶片","PX":"对二甲苯","SA":"纯碱","SC":"原油","SH":"烧碱","TA":"PTA","UR":"尿素","V":"PVC","A":"豆一","AP":"苹果","B":"豆二","C":"玉米","CF":"棉花","CJ":"红枣","CS":"玉米淀粉","JD":"鸡蛋","LG":"原木","LH":"生猪","M":"豆粕","NR":"20号胶","OI":"菜油","P":"棕榈油","PK":"花生","RM":"菜粕","RU":"天然橡胶","SP":"纸浆","SR":"白糖","Y":"豆油"}
