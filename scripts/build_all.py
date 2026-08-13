@@ -44,6 +44,7 @@ def summary_of(detail: dict[str, Any], stale: bool = False) -> dict[str, Any]:
         "change_pct": quote.get("change_pct"),
         "quote_time": quote.get("time"),
         "updated_at": detail.get("updated_at"),
+        "analysis_updated_at": detail.get("analysis_updated_at") or detail.get("updated_at"),
         "score": decision["score"],
         "bias": decision["bias"],
         "tone": decision["tone"],
@@ -61,6 +62,8 @@ def summary_of(detail: dict[str, Any], stale: bool = False) -> dict[str, Any]:
         "resistance": decision["resistance"],
         "long_trigger": decision["long"]["trigger"],
         "short_trigger": decision["short"]["trigger"],
+        "left_long": decision.get("left_long"),
+        "left_short": decision.get("left_short"),
         "stale": stale,
     }
 
@@ -115,7 +118,7 @@ def materialize_site() -> None:
     if SITE_DIR.exists():
         shutil.rmtree(SITE_DIR)
     SITE_DIR.mkdir(parents=True)
-    for name in ("index.html", "app.js", "auth.js", "styles.css", "robots.txt", "404.html", ".nojekyll"):
+    for name in ("index.html", "app.js", "auth.js", "styles.css", "mobile.css", "manifest.webmanifest", "sw.js", "styles.journal.css", "robots.txt", "404.html", ".nojekyll"):
         source = ROOT / name
         if source.exists():
             shutil.copy2(source, SITE_DIR / name)
@@ -147,6 +150,7 @@ def main() -> None:
         help="skip unreliable minute endpoints and publish labelled daily proxies",
     )
     parser.add_argument("--no-site", action="store_true")
+    parser.add_argument("--skip-fundamentals", action="store_true", help="reuse existing fundamentals during intraday strategy rebuilds")
     args = parser.parse_args()
 
     products = engine.get_products()
@@ -209,8 +213,10 @@ def main() -> None:
 
     ordered = sorted(summaries.values(), key=lambda item: (-float(item.get("score") or 0), item["symbol"]))
     fresh = sum(not item.get("stale") for item in ordered)
+    market_updated_at = datetime.now().astimezone().isoformat(timespec="seconds")
     market = {
-        "updated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "updated_at": market_updated_at,
+        "analysis_updated_at": market_updated_at,
         "source": "知几·观｜GitHub Actions 静态快照",
         "total_supported": len(products),
         "total_published": len(ordered),
@@ -222,7 +228,8 @@ def main() -> None:
         "method": "Ari 30% + 缠论 25% + MACD 25% + 江恩 20%；方向看日线与60分钟，15分钟仅作入场确认",
     }
     atomic_json(DATA_DIR / "market.json", market)
-    build_fundamentals(max(1, min(args.workers, 8)))
+    if not args.skip_fundamentals:
+        build_fundamentals(max(1, min(args.workers, 8)))
     if not args.no_site:
         materialize_site()
         security_scan(SITE_DIR)

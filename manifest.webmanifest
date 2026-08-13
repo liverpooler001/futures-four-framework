@@ -1,0 +1,23 @@
+{
+  "id": "./",
+  "name": "渊行 · 期货四框架",
+  "short_name": "渊行",
+  "description": "全品种期货四框架技术决策平台",
+  "lang": "zh-CN",
+  "start_url": "./#radar",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#050a0d",
+  "theme_color": "#071116",
+  "icons": [
+    {"src": "assets/app-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "assets/app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "assets/app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "全市场雷达", "short_name": "雷达", "url": "./#radar", "icons": [{"src": "assets/app-icon-192.png", "sizes": "192x192"}]},
+    {"name": "锌四框架档案", "short_name": "锌 ZN", "url": "./#detail?symbol=ZN", "icons": [{"src": "assets/app-icon-192.png", "sizes": "192x192"}]}
+  ]
+}

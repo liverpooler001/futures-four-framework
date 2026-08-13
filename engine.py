@@ -737,6 +737,77 @@ def unique_levels(values: list[float | None], price: float, threshold: float) ->
     return clustered
 
 
+def left_side_candidates(
+    product: dict[str, Any],
+    price: float,
+    tick: float,
+    atr: float,
+    support1: float,
+    support2: float,
+    resistance1: float,
+    resistance2: float,
+    composite: float,
+    label: str,
+) -> dict[str, dict[str, Any]]:
+    """Build anticipatory entries without presenting them as confirmed signals."""
+    width = max(tick * 2, round_tick(atr * 0.10, tick, "up"))
+    buffer = max(tick * 2, round_tick(atr * 0.12, tick, "up"))
+    long_low = round_tick(support1 - width, tick, "down")
+    long_high = round_tick(support1 + width, tick, "up")
+    short_low = round_tick(resistance1 - width, tick, "down")
+    short_high = round_tick(
+        resistance2 if resistance2 - resistance1 <= atr * 0.75 else resistance1 + width,
+        tick,
+        "up",
+    )
+    long_stop = round_tick(
+        min(long_low - atr * 0.35, support2 - buffer if support1 - support2 <= atr * 0.75 else long_low - buffer),
+        tick,
+        "down",
+    )
+    short_stop = round_tick(
+        max(short_high + atr * 0.35, resistance2 + buffer if resistance2 - resistance1 <= atr * 0.75 else short_high + buffer),
+        tick,
+        "up",
+    )
+    long_target1 = round_tick(resistance1, tick)
+    long_target2 = round_tick(max(resistance2, long_high + (long_high - long_stop) * 1.8), tick, "up")
+    short_target1 = round_tick(support1, tick)
+    short_target2 = round_tick(min(support2, short_low - (short_stop - short_low) * 1.8), tick, "down")
+    mult = finite(product.get("mult"), 1.0) or 1.0
+
+    def status(side: str, low: float, high: float, stop: float) -> str:
+        invalid = price <= stop if side == "long" else price >= stop
+        if invalid:
+            return "已失效"
+        return "进入候选区" if low <= price <= high else "等待进入候选区"
+
+    return {
+        "left_long": {
+            "priority": "顺势左侧候选" if composite > 0 else "逆势备选·仅轻仓",
+            "status": status("long", long_low, long_high, long_stop),
+            "zone": [long_low, long_high],
+            "stop": long_stop,
+            "targets": [long_target1, long_target2],
+            "trigger_text": f"价格进入支撑带后，等待{label}止跌并重新收回区间上沿；禁止直接接下落刀",
+            "invalid": f"{label}收盘跌破 {format_price(long_stop, tick)}，左侧多候选取消",
+            "confirmation": "左侧只做候选提示，初始风险不超过右侧确认仓位的1/3",
+            "risk_per_lot": abs(((long_low + long_high) / 2 - long_stop) * mult),
+        },
+        "left_short": {
+            "priority": "顺势左侧候选" if composite < 0 else "逆势备选·仅轻仓",
+            "status": status("short", short_low, short_high, short_stop),
+            "zone": [short_low, short_high],
+            "stop": short_stop,
+            "targets": [short_target1, short_target2],
+            "trigger_text": f"价格进入压力带后，等待{label}冲高失败并重新跌回区间下沿；禁止见压力就盲空",
+            "invalid": f"{label}收盘站上 {format_price(short_stop, tick)}，左侧空候选取消",
+            "confirmation": "左侧只做候选提示，初始风险不超过右侧确认仓位的1/3",
+            "risk_per_lot": abs((short_stop - (short_low + short_high) / 2) * mult),
+        },
+    }
+
+
 def decision_plan(
     product: dict[str, Any],
     quote: dict[str, Any],
@@ -804,7 +875,7 @@ def decision_plan(
         short_priority = "不追价·等反抽"
     long_status = "已触发待回踩" if price >= long_trigger else "未触发"
     short_status = "已触发待反抽" if price <= short_trigger else "未触发"
-    return {
+    plan = {
         "score": round(composite, 2),
         "bias": bias,
         "tone": tone,
@@ -839,6 +910,11 @@ def decision_plan(
             "short_risk_per_lot": abs((short_stop - sum([short_entry_low, short_entry_high]) / 2) * (finite(product.get("mult"), 1.0) or 1.0)),
         },
     }
+    plan.update(left_side_candidates(
+        product, price, tick, max(atr_60, tick * 8),
+        support1, support2, resistance1, resistance2, composite, "15分钟",
+    ))
+    return plan
 
 
 def timeframe_decision_plan(
@@ -917,7 +993,7 @@ def timeframe_decision_plan(
     }[frame_key]
     qualifier = "代理条件：" if proxy else ""
     mult = finite(product.get("mult"), 1.0) or 1.0
-    return {
+    plan = {
         "frame": frame_key,
         "label": label,
         "horizon": TIMEFRAME_HORIZONS[frame_key],
@@ -957,6 +1033,11 @@ def timeframe_decision_plan(
         "confidence": "代理观察" if proxy else "本级别有效",
         "quality_note": quality.get("label") or "数据状态未知",
     }
+    plan.update(left_side_candidates(
+        product, price, tick, atr,
+        support1, support2, resistance1, resistance2, composite, label,
+    ))
+    return plan
 
 
 def format_price(value: float, tick: float) -> str:
@@ -1167,8 +1248,10 @@ def build_dashboard(
     oi_change = None
     if len(daily_oi) >= 2:
         oi_change = daily_oi[-1]["open_interest"] - daily_oi[-2]["open_interest"]
+    generated_at = datetime.now().astimezone().isoformat(timespec="seconds")
     return {
-        "updated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "updated_at": generated_at,
+        "analysis_updated_at": generated_at,
         "source": "知几·观（实时行情与K线）",
         "data_quality": data_quality,
         "product": product,

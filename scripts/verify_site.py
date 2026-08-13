@@ -18,6 +18,10 @@ for item in products:
     assert path.is_file(), path
     detail = json.loads(path.read_text(encoding="utf-8"))
     assert set(detail["frameworks"]) == {"ari", "chan", "macd", "gann"}
+    assert set(detail["decision"]) >= {"left_long", "left_short"}
+    for plan in (detail["decision"], *(detail.get("strategies") or {}).values()):
+        assert len(plan["left_long"]["zone"]) == 2
+        assert len(plan["left_short"]["zone"]) == 2
     assert detail["decision"].get("confidence") in {"完整多周期", "降级观察"}
     if item["symbol"] in {"JD", "AG", "MA", "RB"}:
         assert set(detail.get("charts") or {}) == {"W", "D", "60", "15"}
@@ -36,6 +40,15 @@ assert '"score"' not in fundamental_raw
 assert '"consistency"' not in fundamental_raw
 assert "fundamentalCard" in (SITE / "index.html").read_text(encoding="utf-8")
 assert (SITE / "auth.js").is_file()
+manifest = json.loads((SITE / "manifest.webmanifest").read_text(encoding="utf-8"))
+assert manifest.get("display") == "standalone"
+assert manifest.get("start_url") == "./#radar"
+assert {icon["sizes"] for icon in manifest.get("icons", [])} >= {"192x192", "512x512"}
+assert (SITE / "sw.js").is_file()
+assert "serviceWorker.register('./sw.js')" in (SITE / "app.js").read_text(encoding="utf-8")
+assert "LEFT-SIDE WATCHLIST" in (SITE / "index.html").read_text(encoding="utf-8")
+for name in ("app-icon-192.png", "app-icon-512.png", "apple-touch-icon.png", "favicon-32.png"):
+    assert (SITE / "assets" / name).stat().st_size > 1_000, name
 assert "hour < 8" in (SITE / "auth.js").read_text(encoding="utf-8")
 assert (SITE / "robots.txt").read_text(encoding="utf-8").strip().endswith("Noindex: /")
 macro = json.loads((SITE / "data" / "macro.json").read_text(encoding="utf-8"))

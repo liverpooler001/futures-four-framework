@@ -3,8 +3,10 @@ name: Refresh futures snapshots and deploy Pages
 on:
   workflow_dispatch:
   schedule:
-    # Beijing 08:00-23:59, weekdays: refresh the public market snapshot every 15 minutes.
-    - cron: "*/15 0-15 * * 1-5"
+    # Beijing day/night trading windows, weekdays: refresh public quotes every 5 minutes.
+    - cron: "*/5 0-7,13-15 * * 1-5"
+    # Recompute four-framework strategies every 30 minutes while the market is active.
+    - cron: "2,32 1-3,5-6,13-15 * * 1-5"
     # Beijing 00:20, Tuesday-Saturday: rebuild all technical/fundamental snapshots in maintenance hours.
     - cron: "20 16 * * 1-5"
   push:
@@ -37,8 +39,14 @@ jobs:
           ZHIJI_GUAN_KEY: ${{ secrets.ZHIJI_GUAN_KEY }}
         run: python scripts/build_all.py --workers 8
 
+      - name: Recompute intraday strategies
+        if: github.event_name == 'schedule' && github.event.schedule == '2,32 1-3,5-6,13-15 * * 1-5'
+        env:
+          ZHIJI_GUAN_KEY: ${{ secrets.ZHIJI_GUAN_KEY }}
+        run: python scripts/build_all.py --workers 8 --skip-fundamentals
+
       - name: Refresh live quotes
-        if: github.event_name == 'schedule' && github.event.schedule == '*/15 0-15 * * 1-5'
+        if: github.event_name == 'schedule' && github.event.schedule == '*/5 0-7,13-15 * * 1-5'
         env:
           ZHIJI_GUAN_KEY: ${{ secrets.ZHIJI_GUAN_KEY }}
         run: python scripts/refresh_quotes.py

@@ -1,0 +1,95 @@
+/* 渊行 · 手账风主题（旅行手账/journal，2026-08-13）
+   通过 body.theme-journal 启用：?theme=journal 或页头切换，localStorage 记忆。
+   只覆盖视觉变量与装饰，不动结构。 */
+body.theme-journal{
+  --abyss:#f4f1e6;--deep:#efe9d8;--panel:#fdfbf3;--panel2:#f3eedd;
+  --line:#d9d2b6;--line2:#7a9b3d;
+  --text:#3f3b2f;--muted:#8a8672;
+  --cyan:#6b8e23;--cyan2:#55701b;--ice:#3d5a12;
+  --amber:#e8910f;--red:#d9534f;--green:#7a9b3d;--blue:#4a7fa5;
+  --chart-grid:#d9d2b6;--chart-text:#8a8672;
+  --shadow:0 12px 34px rgba(90,80,40,.16);
+  background:var(--abyss);color:var(--text);
+}
+body.theme-journal main{background:var(--abyss)}
+
+/* 字体：标题走衬线，正文保留黑体 */
+body.theme-journal h1,body.theme-journal h2,body.theme-journal .cover-copy h1,body.theme-journal .section-title h2{
+  font-family:Georgia,"Times New Roman","STSong","SimSun",serif;letter-spacing:.02em}
+
+/* 封面：天空+纸面 */
+body.theme-journal .cover{background:linear-gradient(#bcd9ea 0%,#dcecd9 34%,#f4f1e6 62%)}
+body.theme-journal .cover-image{background:
+  radial-gradient(ellipse 120px 34px at 18% 12%,rgba(255,255,255,.95) 60%,transparent 61%),
+  radial-gradient(ellipse 90px 26px at 30% 9%,rgba(255,255,255,.85) 60%,transparent 61%),
+  radial-gradient(ellipse 140px 40px at 78% 15%,rgba(255,255,255,.9) 60%,transparent 61%),
+  linear-gradient(#bcd9ea 0%,#dcecd9 40%,rgba(244,241,230,0) 78%)!important;opacity:1}
+body.theme-journal .cover-vignette{background:linear-gradient(rgba(244,241,230,0) 55%,var(--abyss) 96%)}
+body.theme-journal .cover-grid{background-image:none}
+body.theme-journal .cover-grid:after{background:none}
+body.theme-journal .cover-nav{color:#5c5847}
+body.theme-journal .identity i{background:var(--amber);color:#fff;border-radius:8px}
+body.theme-journal .archive-code{color:#fff;background:var(--amber);display:inline-block;padding:3px 14px;border-radius:999px;font-size:10px}
+body.theme-journal .archive-code:before{content:"✈ ";}
+body.theme-journal .cover-copy h1{color:#4a6b15;text-shadow:none}
+body.theme-journal .cover-copy h1>span{font-style:italic}
+body.theme-journal .cover-copy h1 small{color:#6b6752}
+body.theme-journal .cover-copy p{color:#5c5847}
+body.theme-journal .enter-button,body.theme-journal .cover-actions button{
+  background:#f0c93f;border:2px solid #7a9b3d;color:#3f3b2f;border-radius:999px;box-shadow:2px 3px 0 #7a9b3d}
+body.theme-journal .cover-actions button:hover,body.theme-journal .enter-button:hover{background:#f5d85e;transform:translateY(-1px)}
+body.theme-journal .cover-meta div{background:rgba(253,251,243,.85);border:1.5px solid #b9c48a;border-radius:14px}
+body.theme-journal .cover-meta span{color:var(--muted)}
+body.theme-journal .cover-meta b{color:#4a6b15}
+body.theme-journal .depth-scale{display:none}
+body.theme-journal .live-signal{background:#7a9b3d}
+
+/* 页头与导航 */
+body.theme-journal .site-header{background:rgba(244,241,230,.92);border-bottom:2px dashed #b9b089}
+body.theme-journal .site-header nav a{color:#5c5847}
+body.theme-journal .site-header nav a:hover{color:#4a6b15}
+
+/* 面板与卡片：白卡+橄榄描边+圆角 */
+body.theme-journal .rank-panel,body.theme-journal .dark-panel,body.theme-journal .product-card,
+body.theme-journal .macro-card,body.theme-journal .ncard,body.theme-journal .access-box,
+body.theme-journal .fundamental-card,body.theme-journal .strategy-card,body.theme-journal .frame-card{
+  background:var(--panel);border:2px solid #b9c48a;border-radius:18px;box-shadow:var(--shadow)}
+body.theme-journal .section-kicker{color:var(--amber)}
+body.theme-journal .section-title h2{color:#4a6b15}
+body.theme-journal .section-title{border-bottom:2px dashed #b9b089}
+body.theme-journal .product-card{border-width:1.5px}
+body.theme-journal .product-card header b{color:#4a6b15}
+body.theme-journal .product-card .price b{color:#3f3b2f}
+
+/* 表格 */
+body.theme-journal .table-row{border-bottom:1px dashed #ddd6ba}
+body.theme-journal .table-head{color:var(--muted)}
+
+/* 按钮/筛选丸 */
+body.theme-journal button,body.theme-journal .pill{border-radius:999px}
+body.theme-journal #sectorFilters button,body.theme-journal .scanner-summary button,
+body.theme-journal #chartTabs button,body.theme-journal #strategyTabs button{
+  background:#f7f3e4;border:1.5px solid #b9c48a;color:#5c5847;border-radius:999px}
+body.theme-journal #sectorFilters button.active,body.theme-journal .scanner-summary button.active,
+body.theme-journal #chartTabs button.active,body.theme-journal #strategyTabs button.active{
+  background:#f0c93f;border-color:#7a9b3d;color:#3f3b2f;box-shadow:2px 2px 0 #7a9b3d}
+
+/* 涨跌色微调（纸面可读性） */
+body.theme-journal .tone-up{color:#5c8017}
+body.theme-journal .tone-down{color:#c9443f}
+
+/* 图表底板 */
+body.theme-journal .price-chart,body.theme-journal #priceChart{background:#fbf8ee;border:1.5px dashed #b9c48a;border-radius:14px}
+
+/* 门禁 */
+body.theme-journal .access-gate{background:linear-gradient(#bcd9ea,#f4f1e6 70%)}
+body.theme-journal .access-box h1{color:#4a6b15;font-style:italic}
+body.theme-journal .access-box button{background:#f0c93f;border:2px solid #7a9b3d;color:#3f3b2f;box-shadow:2px 3px 0 #7a9b3d}
+
+/* 数据徽章 */
+body.theme-journal .data-badge{border-radius:999px}
+
+/* 页脚 */
+body.theme-journal footer,body.theme-journal .site-footer{border-top:2px dashed #b9b089;color:var(--muted)}
+body.theme-journal .cover-copy h1>span{text-shadow:none;-webkit-text-stroke:0}
+body.theme-journal .cover-copy h1{text-shadow:none;filter:none}

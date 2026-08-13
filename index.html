@@ -2,15 +2,24 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#071116">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="渊行">
   <meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
   <meta name="referrer" content="no-referrer">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests">
   <meta name="description" content="全品种期货四框架技术决策平台：Ari 动量、缠论、MACD 多级别、江恩线。">
   <title>渊行 · 全品种期货四框架</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
   <link rel="preload" href="assets/abyss-voyage-cover.png" as="image">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="mobile.css">
+  <link rel="stylesheet" href="styles.journal.css">
   <style>
     .data-badge{display:inline-flex;width:max-content;margin-top:10px;padding:3px 7px;border:1px solid;font:8px Consolas,monospace;letter-spacing:.08em}
     .data-badge.official{color:var(--green);border-color:rgba(71,193,146,.35)}
@@ -43,9 +52,9 @@
 
   <main id="market">
     <header class="site-header">
-      <a class="identity" href="#cover"><i>Y</i><span>渊行 / 期货四框架</span></a>
-      <nav><a href="#radar">全市场雷达</a><a href="#detail">单品种档案</a><a href="#method">方法与真源</a></nav>
-      <div class="header-state"><span class="live-signal"></span><b id="headerUpdated">载入中</b></div>
+      <a class="identity" href="#cover"><i><img src="assets/favicon-32.png" alt=""></i><span>渊行 / 期货四框架</span></a>
+      <nav><a href="#radar">全市场雷达</a><a href="#detail">单品种档案</a><a href="#method">方法与真源</a><a href="#" id="themeToggle" title="切换 深渊/手账 风格">🌿 手账风</a></nav>
+      <div class="header-actions"><button class="install-app hidden" id="installApp" type="button">安装 App</button><div class="header-state"><span class="live-signal"></span><b id="headerUpdated">载入中</b></div></div>
     </header>
 
     <section class="overview section" id="radar">
@@ -58,7 +67,7 @@
       </div>
     </section>
 
-    <section class="scanner section">
+    <section class="scanner section" id="scanner">
       <div class="scanner-toolbar">
         <div class="search-box"><span>⌕</span><input id="searchInput" placeholder="搜索品种、代码、板块"></div>
         <div class="sector-filters" id="sectorFilters"></div>
@@ -90,6 +99,7 @@
           </div>
           <aside class="decision-rail">
             <article class="strategy-switch dark-panel"><header><div><span>STRATEGY TIMEFRAME</span><h3 id="strategyHorizon">日线 · 波段</h3></div><small id="strategyQuality">默认日线</small></header><div class="chart-tabs" id="strategyTabs"><button data-frame="W">周线</button><button data-frame="D" class="active">日线</button><button data-frame="60">60分钟</button><button data-frame="15">15分钟</button></div></article>
+            <article class="left-candidate dark-panel"><header><div><span>LEFT-SIDE WATCHLIST</span><h3>左侧备选机会</h3></div><small>候选 ≠ 确认</small></header><div class="left-candidate-grid"><section class="left-long"><b id="leftLongPriority">—</b><h4>支撑带试多</h4><strong id="leftLongZone">—</strong><p id="leftLongTrigger">—</p><dl id="leftLongDetail"></dl></section><section class="left-short"><b id="leftShortPriority">—</b><h4>压力带试空</h4><strong id="leftShortZone">—</strong><p id="leftShortTrigger">—</p><dl id="leftShortDetail"></dl></section></div><footer>仅在区间出现反转证据后轻仓试错，单笔风险不超过右侧确认仓位的 1/3。</footer></article>
             <article class="decision-card long-card"><header><span>LONG ROUTE</span><b id="longPriority">—</b></header><h3>做多航线</h3><p id="longTrigger">—</p><dl id="longDetail"></dl><small id="longConfirm">—</small></article>
             <article class="decision-card short-card"><header><span>SHORT ROUTE</span><b id="shortPriority">—</b></header><h3>做空航线</h3><p id="shortTrigger">—</p><dl id="shortDetail"></dl><small id="shortConfirm">—</small></article>
             <article class="fundamental-card dark-panel hidden" id="fundamentalCard"><header><div><span>FUNDAMENTAL FOCUS</span><h3 id="fundamentalTitle">基本面主要矛盾</h3></div></header><p id="fundamentalThesis">—</p><div class="fundamental-metrics" id="fundamentalMetrics"></div><a class="fundamental-link" id="fundamentalLink" href="#" target="_blank" rel="noopener">进入完整基本面框架 <b>↗</b></a></article>
@@ -106,6 +116,7 @@
   <footer><a class="identity" href="#cover"><i>Y</i><span>渊行 / ABYSSAL NAVIGATION</span></a><p>越过价格表面，向结构深处航行。</p><span id="footerUpdated">—</span></footer>
   <div class="loading-screen" id="loadingScreen"><div class="sonar"><i></i></div><span>建立全市场数据链路</span></div>
   <div class="toast" id="toast"></div>
+  <nav class="mobile-nav" aria-label="手机端主导航"><a href="#radar"><span>⌁</span><b>雷达</b></a><a href="#scanner"><span>⌕</span><b>品种</b></a><a href="#detail"><span>◇</span><b>档案</b></a><a href="#method"><span>四</span><b>框架</b></a></nav>
   <script src="auth.js"></script>
   <script src="app.js"></script>
 </body>

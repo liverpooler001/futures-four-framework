@@ -21,7 +21,12 @@ HASHES = {
     "day": "8473d01df08bbb2e40cd7f0ad5e7c9ba002e3674eb16cbbe261c3c46991d6b9c",
     "night": "dfc1d541e6dbbc1f24d98dde8da2f19bd6fc57565ff43ff04a012a12958966ca",
 }
-PUBLIC = {"/", "/index.html", "/auth.js", "/styles.css", "/robots.txt", "/favicon.ico"}
+PUBLIC = {
+    "/", "/index.html", "/auth.js", "/styles.css", "/mobile.css", "/styles.journal.css", "/sw.js",
+    "/manifest.webmanifest", "/robots.txt", "/favicon.ico",
+    "/assets/favicon-32.png", "/assets/apple-touch-icon.png",
+    "/assets/app-icon-192.png", "/assets/app-icon-512.png",
+}
 SECRET = secrets.token_bytes(32)
 FAILURES: dict[str, list[float]] = {}
 
