@@ -1092,6 +1092,41 @@ def curve_quotes(product_code: str, lead_symbol: str) -> list[dict[str, Any]]:
     return clean
 
 
+def volatility_metrics(daily: list[dict[str, Any]]) -> dict[str, Any]:
+    """日线收益率年化波动率 + 一年分位 + 象限归类（做多/做空波动率研究底座）。"""
+    closes = [bar["close"] for bar in daily if bar.get("close")]
+    if len(closes) < 70:
+        return {"vol20": None, "vol60": None, "vol_pct": None, "regime": "数据不足", "trend": None}
+    rets = [closes[i] / closes[i - 1] - 1 for i in range(1, len(closes))]
+
+    def stdev(values: list[float]) -> float:
+        mean = sum(values) / len(values)
+        return math.sqrt(sum((v - mean) ** 2 for v in values) / (len(values) - 1))
+
+    vol20 = stdev(rets[-20:]) * math.sqrt(244) * 100
+    vol60 = stdev(rets[-60:]) * math.sqrt(244) * 100
+    window = vol_series = None
+    vols = []
+    for i in range(20, len(rets) + 1):
+        vols.append(stdev(rets[i - 20:i]) * math.sqrt(244) * 100)
+    window = vols[-244:]
+    vol_pct = sum(1 for v in window if v <= vol20) / len(window)
+    expanding = vol20 > vol60
+    if vol_pct >= 0.75:
+        regime = "高波扩张·顺势" if expanding else "高波收缩·卖波候选"
+    elif vol_pct <= 0.25:
+        regime = "低波启动·留意" if expanding else "低波收敛·买波候选"
+    else:
+        regime = "中波扩张" if expanding else "中波收缩"
+    return {
+        "vol20": round(vol20, 2),
+        "vol60": round(vol60, 2),
+        "vol_pct": round(vol_pct, 3),
+        "regime": regime,
+        "trend": "扩张" if expanding else "收缩",
+    }
+
+
 def build_dashboard(
     symbol: str,
     product_override: dict[str, Any] | None = None,
@@ -1257,6 +1292,7 @@ def build_dashboard(
         "product": product,
         "quote": quote,
         "frames": frames,
+        "volatility": volatility_metrics(daily),
         "frameworks": frameworks,
         "decision": decision,
         "strategies": strategies,
