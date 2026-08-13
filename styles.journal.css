@@ -93,3 +93,64 @@ body.theme-journal .data-badge{border-radius:999px}
 body.theme-journal footer,body.theme-journal .site-footer{border-top:2px dashed #b9b089;color:var(--muted)}
 body.theme-journal .cover-copy h1>span{text-shadow:none;-webkit-text-stroke:0}
 body.theme-journal .cover-copy h1{text-shadow:none;filter:none}
+
+/* ===== 详情页与深色硬编码面统一淡色（2026-08-13 第二轮） ===== */
+body.theme-journal main{background:linear-gradient(#f4f1e6,#efe9d8)}
+body.theme-journal .detail-head{background:var(--panel);border:2px solid #b9c48a;border-radius:18px}
+body.theme-journal .detail-head h2{color:#4a6b15}
+body.theme-journal .detail-code{color:var(--muted)}
+body.theme-journal .detail-price strong{color:#3f3b2f}
+body.theme-journal .framework-card{background:var(--panel);border:2px solid #b9c48a;border-radius:18px}
+body.theme-journal .framework-card h3{color:#4a6b15}
+body.theme-journal .framework-card header span{color:var(--muted)}
+body.theme-journal .framework-card i{background:#f0c93f;color:#3f3b2f;border-radius:8px}
+body.theme-journal .framework-card dl{color:#5c5847}
+body.theme-journal .framework-card dt{color:var(--muted)}
+body.theme-journal .decision-card,body.theme-journal .levels-card,body.theme-journal .truth-card{background:var(--panel);border:2px solid #b9c48a;border-radius:18px}
+body.theme-journal .decision-card h3{color:#4a6b15}
+body.theme-journal .decision-card dl{color:#5c5847}
+body.theme-journal .decision-card small{color:var(--muted)}
+body.theme-journal .decision-card>p{color:#3f3b2f}
+body.theme-journal .left-candidate section{background:var(--panel2);border:1.5px dashed #b9c48a;border-radius:14px}
+body.theme-journal .left-candidate h4{color:#4a6b15}
+body.theme-journal .left-candidate p,body.theme-journal .left-candidate dl{color:#5c5847}
+body.theme-journal .left-candidate footer{color:var(--muted)}
+body.theme-journal .strategy-switch small,body.theme-journal .truth-card p{color:#5c5847}
+body.theme-journal .fundamental-metric{background:var(--panel2);border-radius:12px}
+body.theme-journal .fundamental-metric small{color:var(--muted)}
+body.theme-journal .fundamental-link{color:#55701b;border-top:1px dashed #b9b089}
+body.theme-journal .level-item{color:var(--muted)}
+body.theme-journal .level-item b{color:#3f3b2f}
+body.theme-journal .level-track{background:#e5dfc6}
+body.theme-journal .level-track i{background:#7a9b3d}
+body.theme-journal .method-grid article{background:var(--panel);border:2px solid #b9c48a;border-radius:18px}
+body.theme-journal .method-grid article h3{color:#4a6b15}
+body.theme-journal .method-grid article p{color:#5c5847}
+body.theme-journal .method-grid article span{color:var(--amber)}
+body.theme-journal .provenance{color:var(--muted)}
+body.theme-journal .macro-metrics>div,body.theme-journal .macro-grid>section{background:var(--panel2);border-radius:12px}
+body.theme-journal .macro-grid h4{color:#4a6b15}
+body.theme-journal .market-orbit{background:radial-gradient(circle,#f3eedd 0,#efe9d8 62%,transparent 72%);border:1.5px dashed #b9c48a;border-radius:18px}
+body.theme-journal .orbit-core span,body.theme-journal .orbit-core small{color:var(--muted)}
+body.theme-journal .orbit-ring{border-color:#c9c39a}
+body.theme-journal .rank-item{border-bottom:1px dashed #ddd6ba}
+body.theme-journal .rank-item small{color:var(--muted)}
+body.theme-journal .loading-screen{background:#f4f1e6;color:#5c5847}
+body.theme-journal .sonar i{border-color:#7a9b3d}
+body.theme-journal .access-gate{background:linear-gradient(#bcd9ea,#f4f1e6 70%)}
+body.theme-journal .search-box input{background:var(--panel);border:1.5px solid #b9c48a;border-radius:999px;color:#3f3b2f}
+body.theme-journal .sort-select select{background:var(--panel);border:1.5px solid #b9c48a;border-radius:999px;color:#3f3b2f}
+body.theme-journal .mobile-nav{background:rgba(253,251,243,.96);border-top:2px dashed #b9b089}
+body.theme-journal .mobile-nav a{color:#5c5847}
+body.theme-journal .chart-legend .up{color:#5c8017}
+body.theme-journal .chart-legend .down{color:#c9443f}
+
+/* 每日选品（cover 面板）· 手账风 */
+body.theme-journal .daily-picks{background:rgba(253,251,243,.9);border:2px solid #b9c48a;border-radius:18px;box-shadow:var(--shadow)}
+body.theme-journal .picks-col header{color:#4a6b15;border-bottom:2px dashed #b9b089}
+body.theme-journal .pick-item{background:var(--panel);border:1.5px solid #d9d2b6}
+body.theme-journal .pick-item:hover{border-color:#7a9b3d;transform:translateY(-1px)}
+body.theme-journal .pick-item b{color:#3f3b2f}
+body.theme-journal .pick-item small{color:var(--muted)}
+body.theme-journal .decision-card>p{background:#f3eedd;border-left:3px solid currentColor;border-radius:0 10px 10px 0;color:#3f3b2f}
+body.theme-journal .decision-card small{color:#b8720d}
