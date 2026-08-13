@@ -157,3 +157,12 @@ body.theme-journal .decision-card small{color:#b8720d}
 body.theme-journal .fund-chart{background:#fbf8ee;border:1.5px dashed #b9c48a;border-radius:14px;padding:6px}
 body.theme-journal .fundamental-card>p{background:#f3eedd;border-left:3px solid #7a9b3d;color:#3f3b2f;border-radius:0 10px 10px 0}
 body.theme-journal .fundamental-metrics{background:transparent}
+body.theme-journal .method{background:transparent;border-top:2px dashed #b9b089;border-bottom:2px dashed #b9b089}
+body.theme-journal .method-grid article span{color:#b8720d}
+body.theme-journal .news-card{background:var(--panel);border:2px solid #b9c48a;border-radius:14px}
+body.theme-journal .news-card:hover{border-color:#7a9b3d;box-shadow:2px 3px 0 #7a9b3d}
+body.theme-journal .news-card h4{color:#4a6b15}
+body.theme-journal .news-card p{color:#5c5847}
+body.theme-journal .news-sector{background:#7a9b3d;color:#fff}
+body.theme-journal .news-tag{border-color:#b9c48a;color:#55701b}
+body.theme-journal .news-card footer{color:#b8720d}

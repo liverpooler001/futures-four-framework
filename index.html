@@ -54,7 +54,7 @@
   <main id="market">
     <header class="site-header">
       <a class="identity" href="#cover"><i><img src="assets/favicon-32.png" alt=""></i><span>渊行 / 期货四框架</span></a>
-      <nav><a href="#radar">全市场雷达</a><a href="#detail">单品种档案</a><a href="#method">方法与真源</a><a href="#" id="themeToggle" title="切换 深渊/手账 风格">🌿 手账风</a></nav>
+      <nav><a href="#radar">全市场雷达</a><a href="#detail">单品种档案</a><a href="#method">每周信息</a><a href="#" id="themeToggle" title="切换 深渊/手账 风格">🌿 手账风</a></nav>
       <div class="header-actions"><button class="install-app hidden" id="installApp" type="button">安装 App</button><div class="header-state"><span class="live-signal"></span><b id="headerUpdated">载入中</b></div></div>
     </header>
 
@@ -112,7 +112,7 @@
       </div>
     </section>
 
-    <section class="method section" id="method"><div class="section-kicker"><span>03</span><b>METHODOLOGY &amp; PROVENANCE</b></div><div class="method-grid"><article><span>01 / Ari</span><h3>先判断在哪个主场</h3><p>周线、日线、60分钟与15分钟共同确认趋势和动量；各级别策略独立计算，默认查看日线。</p></article><article><span>02 / 缠论</span><h3>再看结构走到了哪里</h3><p>程序化识别分型、笔、连续三笔重叠中枢与疑似背驰；所有信号明确标注为简化口径。</p></article><article><span>03 / MACD</span><h3>检查多级别是否共振</h3><p>周线定中期背景，日线看波段，60与15分钟负责更短周期执行；观察零轴、交叉与柱体强弱。</p></article><article><span>04 / 江恩</span><h3>给航线装上标尺</h3><p>每个级别分别用近120根K线摆动计算八分位、1×1速度线与时间窗口，形成各自失效边界。</p></article></div><div class="provenance"><p>数据由知几「观」API 提供，GitHub Actions 构建为静态快照。密钥只存在于仓库 Secret，不进入浏览器或发布文件。</p><p>当前接口没有交易所会员席位排名：网站明确留空，绝不生成模拟席位。程序化技术分析属于概率信号，不构成投资建议。</p></div></section>
+    <section class="method section" id="method"><div class="section-kicker"><span>03</span><b>WEEKLY SCAN · 每周信息扫描</b></div><div class="section-title"><div><h2>近一周市场信息与小作文</h2><p>来自目录树数据源网站与公开检索的每周精选；点击卡片看原文。</p></div><div class="build-state" id="newsTime">—</div></div><div class="news-grid" id="newsGrid"></div><div class="provenance"><p>数据由知几「观」API 提供，GitHub Actions 构建为静态快照。密钥只存在于仓库 Secret，不进入浏览器或发布文件。</p><p>当前接口没有交易所会员席位排名：网站明确留空，绝不生成模拟席位。程序化技术分析属于概率信号，不构成投资建议。</p></div></section>
     <section class="macro section" id="macro"><div class="section-kicker"><span>04</span><b>LATEST MACRO RELEASE</b></div><div class="section-title"><div><h2>宏观落地快报</h2><p>只保留当前最新、最重要的一条数据或新闻。</p></div><div class="build-state" id="macroTime">—</div></div><article class="macro-card dark-panel"><header><div><span id="macroStance">—</span><h3 id="macroTitle">载入中</h3></div><small id="macroVerify">—</small></header><p id="macroConclusion">—</p><div class="macro-metrics" id="macroMetrics"></div><div class="macro-grid"><section><h4>资产传导</h4><div id="macroTransmission"></div></section><section><h4>下一验证节点</h4><div id="macroNext"></div></section></div><footer id="macroSources"></footer></article></section>
   </main>
   <footer><a class="identity" href="#cover"><i>Y</i><span>渊行 / ABYSSAL NAVIGATION</span></a><p>越过价格表面，向结构深处航行。</p><span id="footerUpdated">—</span></footer>

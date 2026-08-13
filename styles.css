@@ -34,3 +34,15 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 .fund-legend em{font-style:normal;margin-left:auto}
 .fund-nochart{padding:24px 0;text-align:center;color:var(--muted);font-size:11px}
 @media (max-width:900px){.fund-body{grid-template-columns:1fr}}
+
+/* 每周信息扫描（2026-08-13） */
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-top:18px}
+.news-card{display:block;padding:16px 18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;color:var(--text);text-decoration:none;transition:.18s}
+.news-card:hover{border-color:var(--cyan2);transform:translateY(-2px)}
+.news-card header{display:flex;gap:8px;align-items:center;font-size:9px;color:var(--muted)}
+.news-sector{background:var(--cyan2);color:#04191b;padding:1px 7px;border-radius:999px;font-weight:700}
+.news-tag{border:1px solid var(--line2);padding:0 6px;border-radius:999px;color:var(--cyan)}
+.news-card header small{margin-left:auto}
+.news-card h4{margin:8px 0 6px;font-size:14px;color:var(--text)}
+.news-card p{font-size:11px;color:var(--muted);line-height:1.6}
+.news-card footer{margin-top:8px;font-size:9.5px;color:var(--cyan)}

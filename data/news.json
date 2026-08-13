@@ -1,0 +1,77 @@
+{
+ "updated_at": "2026-08-13T15:00:00+08:00",
+ "items": [
+  {
+   "date": "2026-08-12",
+   "sector": "黑色",
+   "tag": "双焦",
+   "title": "安全督查压制复产节奏，双焦维持偏强",
+   "summary": "煤矿安监复产偏慢，铁水回升至 238.03 万吨（+1.05%），螺纹高炉利润 -85 元/吨仍亏损。供给紧+需求弱的对峙延续。",
+   "source": "新浪财经",
+   "url": "https://finance.sina.com.cn/money/future/fmnews/2026-08-12/doc-inimzivt3742944.shtml"
+  },
+  {
+   "date": "2026-08-12",
+   "sector": "黑色",
+   "tag": "观点",
+   "title": "中信期货：焦煤不追涨——供给很硬，需求很软",
+   "summary": "「中间隔着一个复产」：煤矿开工率<70%+月度进口<1000万吨+港口进口煤库存去化+铁水回 240 万，才是焦煤先涨于焦炭的确认组合。",
+   "source": "中信期货",
+   "url": "https://m.citicsf.com/content/000508/824733"
+  },
+  {
+   "date": "2026-08-10",
+   "sector": "农产品",
+   "tag": "生猪",
+   "summary": "27 省猪价飘红与 8 月计划出栏 1472 万头（环比+3.74%）并存——前期压栏和二育猪源 8 月集中释放，反弹持续性存疑。",
+   "title": "猪价三连涨 vs 集中出栏：8 月成分水岭",
+   "source": "网易/Mysteel",
+   "url": "https://www.163.com/dy/article/L3VFUHTI05568W0A.html"
+  },
+  {
+   "date": "2026-08-07",
+   "sector": "农产品",
+   "tag": "生猪",
+   "title": "猪价止涨回落再磨底，逼近 10 元关口",
+   "summary": "出栏均价回落至 10.33 元/公斤，同比 -29.5%，行业持续亏损；四季度能否回暖取决于产能去化节奏。",
+   "source": "新浪财经/卓创",
+   "url": "https://finance.sina.com.cn/money/bond/2026-08-07/doc-inimmyem4131657.shtml"
+  },
+  {
+   "date": "2026-08-12",
+   "sector": "能化",
+   "tag": "原油",
+   "title": "INE 原油大涨 5.96% 收 563.8，IEA 月报+CPI 双节点",
+   "summary": "能化板块跟涨，高硫燃料油同步走强；夜盘关注 IEA 月报与美国 7 月 CPI 对降息预期的修正。",
+   "source": "五矿期货能化日报",
+   "url": "https://www.fxbaogao.com/detail/5596878"
+  },
+  {
+   "date": "2026-08-12",
+   "sector": "能化",
+   "tag": "PTA",
+   "title": "国君晨报：PX/PTA 成本支撑强，加工费快速走强",
+   "summary": "PX 估值支撑 7700、PTA 5500 附近；计划外降负荷增加推动 PTA 加工费走强，PXN 同步修复。",
+   "source": "国泰君安期货",
+   "url": "http://m.hibor.com.cn/wap_detail.aspx?id=067f1dbb708d3c1af2c199cb8ec898c5"
+  },
+  {
+   "date": "2026-08-12",
+   "sector": "农产品",
+   "tag": "养猪业",
+   "title": "南北猪价 9.9-11.9 元/公斤，大稳小动",
+   "summary": "七大产区报价持稳，终端消费偏弱；冻品库容与鲜销率未见明显改善。",
+   "source": "养猪业信息汇总",
+   "url": "https://www.jbzyw.com/view/514024"
+  },
+  {
+   "date": "2026-08-13",
+   "sector": "宏观",
+   "tag": "CPI",
+   "title": "美国 7 月 CPI 落地：框架站宏观快报已更新",
+   "summary": "详见本站「宏观落地快报」卡——CPI 对 9 月降息定价的影响与商品传导路径。",
+   "source": "本站宏观卡",
+   "url": "#macro"
+  }
+ ]
+}
