@@ -293,6 +293,10 @@ def summarize(metric: tuple[str, str, str, str, str], key: str, previous: dict[s
         previous_day, previous_value = points[-1 - lookback]
         recent = [abs(value) for _, value in points[-12:] if value != 0]
         scale = max(abs(previous_value), statistics.median(recent or [1.0]), 1e-9)
+        step = max(1, len(points) // 130)
+        slim = points[::step]
+        if slim[-1][0] != points[-1][0]:
+            slim = slim + [points[-1]]
         return {
             "id": metric_id, "name": name, "unit": unit, "source": source, "why": why,
             "latest": round(latest, 6), "end": latest_day.isoformat(),
@@ -300,6 +304,7 @@ def summarize(metric: tuple[str, str, str, str, str], key: str, previous: dict[s
             "comparison": f"较{lookback}{freq}前",
             "stale": (date.today() - latest_day).days > max_age,
             "status": "ok", "points": len(points), "previous_end": previous_day.isoformat(),
+            "series": [[d.isoformat(), round(v, 6)] for d, v in slim],
         }
     except Exception as error:  # noqa: BLE001
         if previous and previous.get("latest") is not None:
@@ -351,11 +356,19 @@ def build(workers: int) -> dict[str, Any]:
             spread_ok = spread.get("value") is not None
             if product.get("sector") in NON_PHYSICAL_SECTORS or symbol in NON_PHYSICAL_SYMBOLS:
                 inventory = {"status":"not_applicable","latest":None,"name":"库存不适用","source":"—"}
+            auto_contra = "库存与月差数据待更新。"
+            if inventory_ok:
+                chg = inventory.get("change_pct")
+                dir_txt = "累库" if (chg or 0) > 3 else ("去库" if (chg or 0) < -3 else "持平")
+                struct = spread.get("structure") or spread.get("status") or "结构待更新"
+                key_watch = "累库能否止步" if dir_txt == "累库" else ("去库能否延续" if dir_txt == "去库" else "库存方向选择")
+                auto_contra = (f"{inventory.get('name','库存')}{dir_txt}（{inventory.get('comparison','')} "
+                               f"{chg:+.1f}%），月差{struct}；关键看{key_watch}。（自动初判）")
             output_products.append({
                 "symbol": symbol, "name": product.get("name"), "covered": inventory_ok or spread_ok,
                 "kind": "market_snapshot", "summary": "库存验证现货松紧；主力－下一活跃合约验证期限结构。",
                 "inventory": inventory, "spread": spread,
-                "contradiction": "基础实物面快照", "metrics": [], "library_url": LIBRARY,
+                "contradiction": auto_contra, "metrics": [], "library_url": LIBRARY,
             })
             continue
         output_products.append({

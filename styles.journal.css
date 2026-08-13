@@ -154,3 +154,6 @@ body.theme-journal .pick-item b{color:#3f3b2f}
 body.theme-journal .pick-item small{color:var(--muted)}
 body.theme-journal .decision-card>p{background:#f3eedd;border-left:3px solid currentColor;border-radius:0 10px 10px 0;color:#3f3b2f}
 body.theme-journal .decision-card small{color:#b8720d}
+body.theme-journal .fund-chart{background:#fbf8ee;border:1.5px dashed #b9c48a;border-radius:14px;padding:6px}
+body.theme-journal .fundamental-card>p{background:#f3eedd;border-left:3px solid #7a9b3d;color:#3f3b2f;border-radius:0 10px 10px 0}
+body.theme-journal .fundamental-metrics{background:transparent}

@@ -25,3 +25,12 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 .pick-item small{grid-column:1/-1;color:var(--muted);font-size:9.5px}
 .pick-item .pick-score{font-size:13px;font-weight:700}
 @media (max-width:900px){.cover{height:auto;min-height:100vh;overflow:visible}.daily-picks{position:static;transform:none;width:auto;margin:18px 16px}}
+
+/* 供需主要矛盾卡（宽版，2026-08-13：左文右图） */
+.fundamental-card{margin-top:14px}
+.fund-body{display:grid;grid-template-columns:minmax(240px,5fr) minmax(300px,7fr);gap:16px;align-items:start;margin-top:10px}
+.fund-chart svg{width:100%;height:auto;display:block}
+.fund-legend{display:flex;gap:12px;justify-content:center;font-size:9px;color:var(--muted)}
+.fund-legend em{font-style:normal;margin-left:auto}
+.fund-nochart{padding:24px 0;text-align:center;color:var(--muted);font-size:11px}
+@media (max-width:900px){.fund-body{grid-template-columns:1fr}}
