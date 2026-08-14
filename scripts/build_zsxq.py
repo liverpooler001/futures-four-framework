@@ -59,6 +59,22 @@ def strip_tags(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def emit_zsxq() -> None:
+    """审核定稿后调用：从 news.json 的星球纪要条目生成 data/zsxq.json（按品种对齐）。"""
+    news = json.loads(NEWS.read_text(encoding="utf-8"))
+    by_sym: dict[str, list] = {}
+    for x in news.get("items", []):
+        if x.get("sector") != "星球纪要":
+            continue
+        for sym in x.get("tag", "").split("/"):
+            if sym:
+                by_sym.setdefault(sym, []).append(x)
+    out = ROOT / "data" / "zsxq.json"
+    out.write_text(json.dumps({"updated_at": news.get("updated_at"), "by_symbol": by_sym},
+                              ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"zsxq.json: {len(by_sym)} 品种 {sum(len(v) for v in by_sym.values())} 条")
+
+
 def main() -> None:
     since = datetime.now().astimezone() - timedelta(days=7)
     topics: list[dict] = []
@@ -133,4 +149,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    if "--emit-zsxq" in sys.argv:
+        emit_zsxq()
+    else:
+        main()

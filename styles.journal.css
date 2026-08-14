@@ -168,3 +168,7 @@ body.theme-journal .news-tag{border-color:#b9c48a;color:#55701b}
 body.theme-journal .news-card footer{color:#b8720d}
 body.theme-journal .seat-row{border-bottom:1px dashed #ddd6ba}
 body.theme-journal .seat-vol{color:#55701b;border-top:2px dashed #b9b089}
+body.theme-journal .essay-item{background:#f7f3e4;border:1.5px solid #d9d2b6}
+body.theme-journal .essay-item:hover{border-color:#7a9b3d}
+body.theme-journal .essay-item b{color:#4a6b15}
+body.theme-journal .essay-title{color:#8a8672;border-top:2px dashed #b9b089}
