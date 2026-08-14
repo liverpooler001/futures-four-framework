@@ -46,7 +46,7 @@ if(cur){const ld=byYear[yr][byYear[yr].length-1];s+=`<circle cx="${x(+ld[0].slic
 let axis='';['1月','4月','7月','10月'].forEach((lab,i)=>{const xx=x(i*3+1,1);axis+=`<text x="${xx}" y="${H-5}" fill="${cssv('--chart-text','#789198')}" font-size="9">${lab}</text>`});
 return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${axis}${s}</svg><div class="fund-legend">${years.map((yr,i)=>`<span style="color:${i===years.length-1?cssv('--green','#57d6a5'):cols[i%cols.length]}">— ${yr}</span>`).join('')}<em>${unit||''}</em></div>`}
 function renderFundamental(symbol){const card=$('fundamentalCard'),f=state.fundamentals[String(symbol).toUpperCase()];if(!f?.covered){card.classList.add('hidden');return}card.classList.remove('hidden');const link=$('fundamentalLink');
-$('fundamentalTitle').textContent='供需主要矛盾';$('fundamentalThesis').textContent=f.contradiction||f.summary||'';
+$('fundamentalTitle').textContent='供需主要矛盾';$('fundamentalThesis').innerHTML=(f.contradiction||f.summary||'')+(f.marginal_focus?'<div class=mf>短线边际：'+f.marginal_focus+'</div>':'');
 let rows='',series=null,unit='';
 if(f.kind==='market_snapshot'){const inv=f.inventory||{},sp=f.spread||{};
 const move=inv.latest==null?'未匹配到可靠库存口径':inv.stale?'库存数据滞后':`${inv.comparison} ${inv.change_pct>0?'↑':inv.change_pct<0?'↓':'→'}${fmt(Math.abs(inv.change_pct),1)}%`;
