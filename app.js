@@ -58,7 +58,7 @@ const ms=(f.metrics||[]).filter(m=>m.series&&m.series.length>=20);const head=ms.
 $('fundamentalMetrics').innerHTML=rows;
 $('fundChart').innerHTML=seasonalSVG(series,unit)||'<div class="fund-nochart">该品种暂无足够历史序列出图</div>';
 const es=(state.essays[String(symbol).toUpperCase()]||[]).slice(0,2);const fold=$('essayFold');
-if(fold){if(!es.length){fold.classList.add('hidden')}else{fold.classList.remove('hidden');$('essaySummary').textContent=`近半月 ${es.length} 条`;$('essayBody').innerHTML=es.map(x=>`<div class="essay-item"><small>${x.date} · ${x.source||'知识星球'}</small><b>${x.title}</b><p>${x.summary}${x.summary&&x.summary.endsWith('…')?` <a class="essay-more" href="${x.url}" target="_blank" rel="noopener">查看原文 ↗</a>`:''}</p></div>`).join('')}}
+if(fold){if(!es.length){fold.classList.add('hidden')}else{fold.classList.remove('hidden');$('essaySummary').textContent=`近半月 ${es.length} 条`;$('essayBody').innerHTML=es.map(x=>{const s=(x.summary||'').trim();const short=s.length>40?s.slice(0,40)+'…':s;return `<div class="essay-item"><small>${x.date} · ${x.source||'知识星球'}</small><b>${x.title}</b><p>${short}${s.length>40?` <a class="essay-more" href="${x.url}" target="_blank" rel="noopener">查看全文 ↗</a>`:''}</p></div>`}).join('')}}
 }
 function renderEquityFold(symbol){const fold=$('equityFold');if(!fold)return;const e=state.equity[String(symbol).toUpperCase()];
 if(!e||!e.stocks?.length){fold.classList.add('hidden');return}fold.classList.remove('hidden');
