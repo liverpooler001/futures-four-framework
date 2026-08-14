@@ -177,3 +177,5 @@ body.theme-journal .equity-row{border-bottom:1px dashed #ddd6ba}
 body.theme-journal .equity-fold summary em{color:#55701b}
 body.theme-journal .seat-row b{color:#3f3b2f}
 body.theme-journal .mf{color:#b8720d;border-top:1px dashed #b9b089}
+body.theme-journal .essay-fold{background:var(--panel);border:2px solid #b9c48a;border-radius:18px}
+body.theme-journal .essay-fold summary em{color:#55701b}

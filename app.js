@@ -57,15 +57,9 @@ else{rows=(f.metrics||[]).slice(0,3).map(m=>{const move=m.change_pct==null?'读�
 const ms=(f.metrics||[]).filter(m=>m.series&&m.series.length>=20);const head=ms.find(m=>m.id===f.chart_id)||ms[0];series=head?.series;unit=head?.unit;link.href=f.library_url;link.classList.remove('hidden')}
 $('fundamentalMetrics').innerHTML=rows;
 $('fundChart').innerHTML=seasonalSVG(series,unit)||'<div class="fund-nochart">该品种暂无足够历史序列出图</div>';
-const es=state.essays[String(symbol).toUpperCase()]||[];$('essayList').innerHTML=es.length?`<div class="essay-title">相关小作文 / 纪要（知识星球·近一周）</div>`+es.map(x=>`<a class="essay-item" href="${x.url}" target="_blank" rel="noopener"><small>${x.date}</small><b>${x.title}</b><p>${x.summary}</p></a>`).join(''):''}
-function renderEquityFold(symbol){const fold=$('equityFold');if(!fold)return;const e=state.equity[String(symbol).toUpperCase()];
-if(!e||!e.stocks?.length){fold.classList.add('hidden');return}fold.classList.remove('hidden');
-const b=e.basket||[],lo=b.length?Math.min(...b):0,hi=b.length?Math.max(...b):1,span=hi-lo||1;
-const pts=b.map((v,i)=>`${(i*440/Math.max(1,b.length-1)+30).toFixed(0)},${(52-(v-lo)/span*44).toFixed(1)}`).join(' ');
-const chg=e.basket_chg60;
-$('equitySummary').textContent=chg!=null?`篮子60日 ${chg>=0?'+':''}${chg}%`:'';
-const spark=b.length?`<svg viewBox="0 0 500 60" class="equity-spark"><polyline points="${pts}" fill="none" stroke="${chg>=0?'#7a9b3d':'#c9443f'}" stroke-width="1.8"/><line x1="30" y1="${(52-(100-lo)/span*44).toFixed(1)}" x2="470" y2="${(52-(100-lo)/span*44).toFixed(1)}" stroke="#999" stroke-dasharray="4 3" stroke-width="0.8"/></svg>`:'';
-$('equityBody').innerHTML=spark+e.stocks.map(s=>`<div class="equity-row"><div><b>${s.name}</b><small>${s.code}</small></div><span>${s.price??'—'}</span><span class="${(s.chg||0)>0?'tone-up':(s.chg||0)<0?'tone-down':'tone-neutral'}">${s.chg!=null?(s.chg>=0?'+':'')+s.chg+'%':'—'}<small>日</small></span><span class="${(s.chg5||0)>0?'tone-up':(s.chg5||0)<0?'tone-down':'tone-neutral'}">${s.chg5!=null?(s.chg5>=0?'+':'')+s.chg5+'%':'—'}<small>5日</small></span><span class="${(s.chg20||0)>0?'tone-up':(s.chg20||0)<0?'tone-down':'tone-neutral'}">${s.chg20!=null?(s.chg20>=0?'+':'')+s.chg20+'%':'—'}<small>20日</small></span></div>`).join('')}
+const es=(state.essays[String(symbol).toUpperCase()]||[]).slice(0,2);const fold=$('essayFold');
+if(fold){if(!es.length){fold.classList.add('hidden')}else{fold.classList.remove('hidden');$('essaySummary').textContent=`近半月 ${es.length} 条`;$('essayBody').innerHTML=es.map(x=>`<a class="essay-item" href="${x.url}" target="_blank" rel="noopener"><small>${x.date}</small><b>${x.title}</b><p>${x.summary}</p></a>`).join('')}}
+}
 function renderSeats(symbol,vol){const el=$('seatRows');if(!el)return;const s=state.seats[String(symbol).toUpperCase()];
 if(!s){el.innerHTML='<div class="seat-empty">该品种暂无席位数据</div>';}
 else{el.innerHTML=Object.entries(s.brokers).map(([b,arr])=>{const last=arr[arr.length-1],prev=arr.length>1?arr[arr.length-2]:last,base=arr.length>5?arr[arr.length-6]:arr[0];

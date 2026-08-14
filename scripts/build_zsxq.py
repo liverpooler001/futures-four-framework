@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 GROUP_ID = "28888112822211"
-ARCHIVE = Path(r"D:\Kimi\纪要小能手_存档.json")
+ARCHIVE = Path(r"D:\Kimi\网站维护\纪要小能手_存档.json")
 NEWS = ROOT / "data" / "news.json"
 
 # 品种关键词 → 站点 symbol（宁滥勿缺的多义词已收窄）
@@ -76,7 +76,7 @@ def emit_zsxq() -> None:
 
 
 def main() -> None:
-    since = datetime.now().astimezone() - timedelta(days=7)
+    since = datetime.now().astimezone() - timedelta(days=15)
     topics: list[dict] = []
     cursor = None
     for _ in range(15):  # 最多 15 页

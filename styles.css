@@ -109,3 +109,14 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 
 /* 短线边际（marginal_focus） */
 .mf{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:10.5px;color:var(--amber);font-weight:400}
+
+/* 相关流言折叠卡（2026-08-14） */
+.essay-fold{margin-top:14px}
+.essay-fold summary{display:flex;align-items:center;gap:12px;cursor:pointer;list-style:none}
+.essay-fold summary::-webkit-details-marker{display:none}
+.essay-fold summary span{font:8px Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.essay-fold summary h3{font-size:15px;margin:0}
+.essay-fold summary em{margin-left:auto;font-style:normal;font-size:11px;color:var(--cyan)}
+.essay-fold summary:after{content:"▾";color:var(--muted)}
+.essay-fold[open] summary:after{content:"▴"}
+.essay-fold .essay-item{margin-top:8px}
