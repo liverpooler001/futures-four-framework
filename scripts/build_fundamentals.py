@@ -162,6 +162,9 @@ def load_json(path: Path, default: Any) -> Any:
         return default
 
 
+CONTRADICTIONS = {'AG': '实际利率2.4%压制+无央行购金缓冲(贵金属弱腿),金银比68-70高位——纯宏观,看美债/美元/美国数据。', 'AU': '实际利率压制vs央行购金托底(~1000吨/年)+避险,金脱离商品周期独立走强——纯宏观。', 'AO': '铝土矿(山西/河南)紧张+检修推价vs电解铝刚需托底,但自身产能充足、矿紧向价传导有限。', 'SS': '产能过剩+需求(表需+10%)vs成本(镍)下移——过剩压顶、成本支撑。', 'PS': '政策底(反内卷+232)vs真实现金成本更低(头部2.3-3.3万,成本下移)——过剩难出清,政策底有效性存疑。', 'PK': '供应宽松+油厂收购谨慎,基差Contango(-862)显示现货弱于盘面——油厂收购是锚。', 'BC': '保税区库存+进口盈亏+LME/COMEX价差,内外联动,保税库存是缓冲。', 'AD': '再生铝成本(废铝)驱动+压铸需求(汽车/家电)vs电解铝价差,供需紧平衡。', 'PD': '汽车催化需求+南非/俄供给,需求结构性走弱(燃油车占比降)。', 'PT': '氢能+首饰+汽车催化,供给(南非)vs需求结构。', 'A': '国产豆新季产量+政策收储托底vs压榨/食用需求,供应宽松。', 'B': '进口大豆到港成本(美豆/南美)+压榨利润,供应宽松vs压榨需求。', 'AP': '新季套袋/坐果定产量,冷库旧果去化vs新果上市,季节性博弈。', 'CF': '新棉产量+纺企补库+抛储,供应宽松vs需求偏弱。', 'CJ': '新季坐果定产量+现货走货,丰产预期压制。', 'CS': '玉米成本+开工vs下游(造纸/食品)需求,成本支撑。', 'RM': '加拿大菜籽+养殖(水产/猪)需求,供给收紧vs需求。', 'Y': '大豆压榨+油脂需求(餐饮/生物柴油),供应与需求。', 'OI': '加拿大菜籽供应(反倾销)+压榨,供给收紧vs需求偏弱。', 'SR': '巴西/印度产量+国内库存+糖厂压榨,供应与需求博弈。', 'SC': 'OPEC减产/增产+地缘(中东)+需求,供给与地缘定价。', 'BU': '基建/道路需求淡季+炼厂开工,累库压制,等旺季。', 'FU': '高硫裂解+船燃需求+中东/俄罗斯供应,地缘与季节性。', 'LU': '船燃需求+调和成本,供应宽松。', 'PG': '沙特CP价+燃烧/化工(PDH)需求,季节性(冬季燃烧旺)。', 'EG': '煤制/油制成本+库存高位vs聚酯需求,供给过剩压制。', 'EB': '纯苯成本+自身开工vsPS/ABS/丁苯需求,成本主导。', 'BZ': '石脑油成本+芳烃利润vs下游(苯乙烯/己内酰胺)需求,成本定价。', 'PF': 'PTA成本+纺服需求,成本支撑vs需求淡季。', 'PR': 'PTA/MEG成本+聚酯瓶片出口需求,成本与需求博弈。', 'PX': '石脑油成本+PTA需求+调油,成本与需求博弈。', 'PP': '原油成本+库存vs塑编/注塑需求,供需宽松。', 'PL': '原油+聚丙烯需求,成本定价。', 'BR': '丁二烯成本+顺丁胶供给vs轮胎需求,成本与需求博弈。', 'RU': '泰国/印尼供给+轮胎需求,天气(厄尔尼诺)扰动。', 'NR': '泰国杯胶/胶水成本+轮胎需求,成本支撑vs需求季节性。', 'FG': '地产竣工需求弱+纯碱成本+冷修供给收缩,供需双弱底部震荡。', 'UR': '煤价成本+农需(春耕/秋播)+出口政策,成本与季节性。', 'SH': '氧化铝需求(第一大下游)+氯碱平衡,需求驱动。', 'SP': '海外浆价(巴西/加拿大)+纸厂需求+库存,供需双弱。', 'HC': '制造业(汽车/机械/出口)需求+铁水成本vs高炉减产,供需平衡偏松。', 'WR': '建材需求弱+钢厂减产,供需双弱。', 'SF': '电力成本+钢厂需求+双控政策,成本支撑。', 'SM': '锰矿成本+钢厂需求+双控,成本与需求博弈。', 'ZC': '电厂日耗+港口库存+政策(保供),季节性(迎峰度夏)。', 'LG': '建筑需求+进口(新西兰/欧洲),需求疲弱vs供应充足。', 'EC': '欧线运价(SCFI)+运力供需(红海绕行/新船交付),运价弹性大。', 'IF': '沪深300,看宏观流动性/大盘盈利/风险偏好。', 'IH': '上证50,看大金融/宏观流动性。', 'IC': '中证500,看宏观流动性/中小盘盈利/风险偏好。', 'IM': '中证1000,看中小盘/微盘流动性。', 'T': '10年国债,看利率/货币政策/经济数据。', 'TF': '5年国债,看利率/货币政策。', 'TS': '2年国债,看资金面/短端利率。', 'TL': '30年国债,看长端利率/久期。'}
+
+
 def write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix(path.suffix + ".tmp")
@@ -388,13 +391,13 @@ def build(workers: int) -> dict[str, Any]:
                 "symbol": symbol, "name": product.get("name"), "covered": inventory_ok or spread_ok,
                 "kind": "market_snapshot", "summary": "库存验证现货松紧；主力－下一活跃合约验证期限结构。",
                 "inventory": inventory, "spread": spread,
-                "contradiction": auto_contra, "metrics": [], "library_url": LIBRARY,
+                "contradiction": CONTRADICTIONS.get(symbol) or auto_contra, "metrics": [], "library_url": LIBRARY,
             })
             continue
         output_products.append({
             "symbol": symbol, "name": product.get("name"), "covered": True,
             "kind": "focus",
-            "contradiction": config["contradiction"],
+            "contradiction": CONTRADICTIONS.get(symbol) or config["contradiction"],
             "marginal_focus": config.get("marginal_focus"),
             "metrics": [results[item[0]] for item in config["metrics"]],
             "chart_id": CHART_PICK.get(symbol),
