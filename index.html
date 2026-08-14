@@ -55,7 +55,7 @@
     <header class="site-header">
       <a class="identity" href="#cover"><i><img src="assets/favicon-32.png" alt=""></i><span>渊行 / 期货四框架</span></a>
       <nav><a href="#radar">全市场雷达</a><a href="#detail">单品种档案</a><a href="#method">每周信息</a><a href="#" id="themeToggle" title="切换 深渊/手账 风格">🌿 手账风</a></nav>
-      <div class="header-actions"><button class="install-app hidden" id="installApp" type="button">安装 App</button><div class="header-state"><span class="live-signal"></span><b id="headerUpdated">载入中</b></div></div>
+      <div class="header-actions"><button class="acct-btn" id="acctBtn" type="button" onclick="openAcctModal()">登录 / 注册</button><button class="pos-btn hidden" id="posBtn" type="button" onclick="togglePosPanel()">模拟持仓</button><button class="install-app hidden" id="installApp" type="button">安装 App</button><div class="header-state"><span class="live-signal"></span><b id="headerUpdated">载入中</b></div></div>
     </header>
 
     <section class="overview section" id="radar">
@@ -86,7 +86,7 @@
           <div><div class="detail-code"><span id="detailSector">—</span><b id="detailContract">—</b></div><h2 id="detailName">—</h2><p id="detailSource">—</p></div>
           <div class="detail-price"><strong id="detailPrice">—</strong><span id="detailChange">—</span></div>
           <div class="detail-score"><span>四框架共振</span><b id="detailScore">—</b><em id="detailBias">—</em></div>
-          <button class="close-detail" id="closeDetail">×</button>
+          <div class="paper-actions"><button onclick="openPaperPosition('long')">开模拟多</button><button onclick="openPaperPosition('short')">开模拟空</button></div><button class="close-detail" id="closeDetail">×</button>
         </div>
         <div class="detail-layout">
           <div class="detail-main">
@@ -122,7 +122,19 @@
   <div class="loading-screen" id="loadingScreen"><div class="sonar"><i></i></div><span>建立全市场数据链路</span></div>
   <div class="toast" id="toast"></div>
   <nav class="mobile-nav" aria-label="手机端主导航"><a href="#radar"><span>⌁</span><b>雷达</b></a><a href="#scanner"><span>⌕</span><b>品种</b></a><a href="#detail"><span>◇</span><b>档案</b></a><a href="#method"><span>四</span><b>框架</b></a></nav>
-  <script src="auth.js"></script>
+  <div class="acct-modal hidden" id="acctModal"><div class="acct-box">
+<h3>手机号登录 / 注册</h3><p>未注册的手机号将自动创建账号</p>
+<input id="acctPhone" placeholder="手机号" maxlength="11" inputmode="numeric">
+<input id="acctPass" type="password" placeholder="密码（至少 6 位）" maxlength="32">
+<input id="acctName" placeholder="昵称（注册时填，可留空）" maxlength="24">
+<div class="acct-err" id="acctError"></div>
+<div class="acct-actions"><button onclick="acctSubmit()">进入</button><button onclick="document.getElementById('acctModal').classList.add('hidden')">取消</button></div>
+<small>已有账户的用户名密码体系与访问时段门禁互相独立。</small>
+<button class="acct-logout" onclick="acctLogout()">退出当前账号</button>
+</div></div>
+<div class="pos-panel hidden" id="posPanel"><header><h3>模拟持仓</h3><button onclick="togglePosPanel()">×</button></header><div id="posBody"></div></div>
+<script src="auth.js"></script>
+<script src="account.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

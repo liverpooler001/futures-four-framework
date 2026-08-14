@@ -214,3 +214,10 @@ body.theme-journal .focus-tags i{border-color:#b9c48a;color:#55701b;background:#
 body.theme-journal .essay-more{color:#b8720d}
 body.theme-journal .cover-focus .focus-card{background:rgba(253,251,243,.92)}
 body.theme-journal .cover-focus-title{color:#55701b}
+body.theme-journal .acct-modal{background:rgba(90,80,40,.35)}
+body.theme-journal .acct-box{background:var(--panel);border:2px solid #b9c48a;border-radius:18px}
+body.theme-journal .acct-box h3{color:#4a6b15}
+body.theme-journal .acct-actions button:first-child{background:#f0c93f;border:2px solid #7a9b3d;color:#3f3b2f}
+body.theme-journal .acct-btn,body.theme-journal .pos-btn{border-color:#b9c48a;color:#55701b;background:var(--panel)}
+body.theme-journal .pos-panel{background:var(--abyss);border-left:2px dashed #b9b089}
+body.theme-journal .pos-row{border-bottom:1px dashed #ddd6ba}

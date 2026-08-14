@@ -22,7 +22,7 @@ HASHES = {
     "night": "dfc1d541e6dbbc1f24d98dde8da2f19bd6fc57565ff43ff04a012a12958966ca",
 }
 PUBLIC = {
-    "/", "/index.html", "/auth.js", "/styles.css", "/mobile.css", "/styles.journal.css", "/sw.js",
+    "/", "/index.html", "/auth.js", "/styles.css", "/mobile.css", "/styles.journal.css", "/account.js", "/sw.js",
     "/manifest.webmanifest", "/robots.txt", "/favicon.ico",
     "/assets/favicon-32.png", "/assets/apple-touch-icon.png",
     "/assets/app-icon-192.png", "/assets/app-icon-512.png",
