@@ -152,3 +152,4 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 .focus-price small{font-size:11px;margin-left:8px}
 .focus-tags{display:flex;flex-wrap:wrap;gap:6px}
 .focus-tags i{font-style:normal;font-size:9.5px;padding:2px 8px;border:1px solid var(--line2);border-radius:999px;color:var(--cyan)}
+.essay-more{color:var(--cyan);text-decoration:none;font-size:10px}
