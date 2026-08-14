@@ -225,3 +225,6 @@ body.theme-journal .div-meter{background:#f7f3e4;border-color:#b9c48a}
 body.theme-journal .div-row{border-bottom:1px dashed #ddd6ba}
 body.theme-journal .div-row:hover{background:#f3eedd}
 body.theme-journal .div-row b{color:#4a6b15}
+body.theme-journal .div-fold{background:var(--panel);border:2px solid #b9c48a;border-radius:18px}
+body.theme-journal .div-fold summary em{color:#55701b}
+body.theme-journal .div-dot:hover circle{stroke:#4a6b15}

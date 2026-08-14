@@ -205,3 +205,15 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 .div-row{padding:9px 4px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12px}
 .div-row:hover{background:var(--panel)}
 .div-row small{color:var(--muted);font-size:10px}
+
+/* 股商热力图折叠（2026-08-14） */
+.div-fold{padding:18px}
+.div-fold summary{display:flex;align-items:center;gap:12px;cursor:pointer;list-style:none}
+.div-fold summary::-webkit-details-marker{display:none}
+.div-fold summary span{font:8px Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.div-fold summary h3{font-size:15px;margin:0}
+.div-fold summary em{margin-left:auto;font-style:normal;font-size:11px;color:var(--cyan)}
+.div-fold summary:after{content:"▴";color:var(--muted)}
+.div-fold:not([open]) summary:after{content:"▾"}
+.div-chart{margin:10px 0 6px}
+.div-dot:hover circle{stroke:#fff;stroke-width:1.5}
