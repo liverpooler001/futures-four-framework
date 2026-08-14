@@ -204,3 +204,10 @@ body.theme-journal .macro-card.dark-panel a{
   color:var(--text,#3f3b2f) !important;
 }
 body.theme-journal .macro-card.dark-panel .macro-metrics>div small{color:var(--muted,#8a8672) !important}
+body.theme-journal .focus-card{background:var(--panel);border:2px solid #b9c48a;border-radius:16px;box-shadow:var(--shadow)}
+body.theme-journal .focus-card:hover{border-color:#7a9b3d;box-shadow:2px 3px 0 #7a9b3d}
+body.theme-journal .focus-card.up:before{background:#7a9b3d}
+body.theme-journal .focus-card.down:before{background:#c9443f}
+body.theme-journal .focus-card header b{color:#4a6b15}
+body.theme-journal .focus-price{color:#3f3b2f}
+body.theme-journal .focus-tags i{border-color:#b9c48a;color:#55701b;background:#f7f3e4}

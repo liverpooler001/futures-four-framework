@@ -127,6 +127,13 @@ def materialize_site() -> None:
             shutil.copy2(source, SITE_DIR / name)
     shutil.copytree(ROOT / "assets", SITE_DIR / "assets")
     shutil.copytree(ROOT / "data", SITE_DIR / "data")
+    # 资源版本戳：index.html 与 js/css 版本绑定，防止 SW/缓存混用新旧版本
+    stamp = datetime.now().astimezone().strftime("%Y%m%d%H%M")
+    index_path = SITE_DIR / "index.html"
+    html = index_path.read_text(encoding="utf-8")
+    for asset in ("app.js", "auth.js", "styles.css", "mobile.css", "styles.journal.css"):
+        html = html.replace(f'href="{asset}"', f'href="{asset}?v={stamp}"').replace(f'src="{asset}"', f'src="{asset}?v={stamp}"')
+    index_path.write_text(html, encoding="utf-8")
 
 
 def security_scan(directory: Path) -> None:
