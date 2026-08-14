@@ -182,3 +182,25 @@ body.theme-journal .essay-fold summary em{color:#55701b}
 body.theme-journal .framework-fold{background:var(--panel);border:2px solid #b9c48a;border-radius:18px}
 body.theme-journal .fw-sum i{color:#8a8672}
 body.theme-journal .fw-sum b{color:#4a6b15}
+
+/* 并入对方会话 34b878e8 的规则 */
+body.theme-journal .macro-card.dark-panel{
+  background:#fdfbf3 !important;
+  background-image:none !important;
+  border-color:#b9c48a !important;
+  color:var(--text,#3f3b2f) !important;
+}
+body.theme-journal .macro-card.dark-panel .macro-metrics>div,
+body.theme-journal .macro-card.dark-panel .macro-grid>section{
+  background:#f3eedd !important;
+  color:var(--text,#3f3b2f) !important;
+}
+body.theme-journal .macro-card.dark-panel h3,
+body.theme-journal .macro-card.dark-panel h4,
+body.theme-journal .macro-card.dark-panel p,
+body.theme-journal .macro-card.dark-panel small,
+body.theme-journal .macro-card.dark-panel span,
+body.theme-journal .macro-card.dark-panel a{
+  color:var(--text,#3f3b2f) !important;
+}
+body.theme-journal .macro-card.dark-panel .macro-metrics>div small{color:var(--muted,#8a8672) !important}
