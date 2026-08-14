@@ -80,6 +80,61 @@ EQUITY_MAP = {
 }
 
 
+def comm_closes(symbol: str, n: int = 90) -> list[float]:
+    """商品主连日线（走 engine 的知几/缓存通道）。"""
+    try:
+        import engine
+        bars = engine.get_bars(symbol, "D", n + 10, 3600)
+        return [b["close"] for b in bars][-n:]
+    except Exception:
+        return []
+
+
+def divergence_metrics(comm: list[float], basket_closes: list[list[float]]) -> dict:
+    """商品 vs 篮子：5/20 日收益差 + 20 日滚动相关 + 信号句。"""
+    if len(comm) < 25 or not basket_closes:
+        return {}
+    def rets(x): return [x[i] / x[i - 1] - 1 for i in range(1, len(x))]
+    def chg(x, n): return (x[-1] / x[-1 - n] - 1) * 100 if len(x) > n else None
+    cr, br = rets(comm), None
+    valid = [rets(c) for c in basket_closes if len(c) >= 25]
+    if not valid:
+        return {}
+    m = min(len(r) for r in valid + [cr])
+    br = [sum(r[-m + i] for r in valid) / len(valid) for i in range(m)]
+    cr = cr[-m:]
+    # 篮子指数（等权收益累乘）
+    basket_idx = [1.0]
+    for r in br:
+        basket_idx.append(basket_idx[-1] * (1 + r))
+    c5, c20 = chg(comm, 5), chg(comm, 20)
+    b5, b20 = chg(basket_idx, 5), chg(basket_idx, 20)
+    corr = None
+    if m >= 21:
+        x, y = cr[-20:], br[-20:]
+        mx, my = sum(x) / 20, sum(y) / 20
+        cov = sum((a - mx) * (b - my) for a, b in zip(x, y))
+        vx = sum((a - mx) ** 2 for a in x); vy = sum((b - my) ** 2 for b in y)
+        if vx > 0 and vy > 0:
+            corr = cov / (vx * vy) ** 0.5
+    div20 = (b20 - c20) if (b20 is not None and c20 is not None) else None
+    div5 = (b5 - c5) if (b5 is not None and c5 is not None) else None
+    signal = ""
+    if div20 is not None:
+        if div20 >= 6:
+            signal = f"股强商弱 {div20:+.1f}%，商品补涨概率升"
+        elif div20 <= -6:
+            signal = f"股弱商强 {div20:+.1f}%，警惕商品回吐"
+        else:
+            signal = f"股商基本同步（差 {div20:+.1f}%）"
+    return {"comm_chg5": _r2(c5), "comm_chg20": _r2(c20), "basket_chg5": _r2(b5), "basket_chg20": _r2(b20),
+            "div5": _r2(div5), "div20": _r2(div20), "corr20": _r2(corr), "div_signal": signal}
+
+
+def _r2(v):
+    return round(v, 2) if v is not None else None
+
+
 def sina_quotes(codes: list[str]) -> dict[str, dict]:
     out = {}
     for i in range(0, len(codes), 40):
@@ -143,8 +198,11 @@ def main() -> None:
         n_valid = sum(1 for c, _ in stocks if len(daily.get(c) or []) >= 60)
         if basket_series and n_valid:
             basket_series = [round(v / n_valid, 2) for v in basket_series]
+        comm = comm_closes(sym)
+        div = divergence_metrics(comm, [daily.get(c) or [] for c, _ in stocks])
         out[sym] = {"stocks": rows, "basket": basket_series,
-                    "basket_chg60": round(basket_series[-1] - 100, 2) if basket_series else None}
+                    "basket_chg60": round(basket_series[-1] - 100, 2) if basket_series else None,
+                    **div}
     payload = {"updated_at": datetime.now().astimezone().isoformat(timespec="seconds"),
                "note": "相关股票篮子：实时涨跌+5日/20日变动+60日归一化（起点=100）；新浪行情",
                "products": out}

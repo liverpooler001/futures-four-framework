@@ -192,3 +192,16 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 .pos-row.closed{opacity:.55}
 .pos-close{padding:3px 10px;border:1px solid var(--line2);border-radius:6px;background:transparent;color:var(--text);font-size:10px;cursor:pointer}
 .pos-empty{padding:20px 0;text-align:center;color:var(--muted);font-size:11px}
+
+/* 股商背离仪+热力表（2026-08-14） */
+.div-meter{margin:10px 0;padding:10px 12px;border:1px dashed var(--line2);border-radius:10px}
+.div-line{display:flex;gap:8px;align-items:baseline;font-size:10px;color:var(--muted)}
+.div-line b{color:var(--text);font-size:12px}
+.div-signal{margin-top:6px;font-size:11.5px;color:var(--text)}
+.div-hot{border-color:var(--green)}.div-cold{border-color:var(--red)}
+.div-hot .div-signal{color:var(--green)}.div-cold .div-signal{color:var(--red)}
+.div-board-head,.div-row{display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr 2fr;gap:10px;align-items:center}
+.div-board-head{font-size:9.5px;color:var(--muted);padding:8px 4px;border-bottom:1px solid var(--line)}
+.div-row{padding:9px 4px;border-bottom:1px solid var(--line);cursor:pointer;font-size:12px}
+.div-row:hover{background:var(--panel)}
+.div-row small{color:var(--muted);font-size:10px}

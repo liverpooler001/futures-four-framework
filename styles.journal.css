@@ -221,3 +221,7 @@ body.theme-journal .acct-actions button:first-child{background:#f0c93f;border:2p
 body.theme-journal .acct-btn,body.theme-journal .pos-btn{border-color:#b9c48a;color:#55701b;background:var(--panel)}
 body.theme-journal .pos-panel{background:var(--abyss);border-left:2px dashed #b9b089}
 body.theme-journal .pos-row{border-bottom:1px dashed #ddd6ba}
+body.theme-journal .div-meter{background:#f7f3e4;border-color:#b9c48a}
+body.theme-journal .div-row{border-bottom:1px dashed #ddd6ba}
+body.theme-journal .div-row:hover{background:#f3eedd}
+body.theme-journal .div-row b{color:#4a6b15}
