@@ -37,7 +37,7 @@ return{p,total,reasons}}).filter(x=>x.total>=4.5||x.reasons.length>=2).sort((a,b
 el.innerHTML=scored.map(x=>{const p=x.p,tone=p.score>0.5?'up':p.score<-0.5?'down':'neutral';
 return`<article class="focus-card ${tone}" data-symbol="${p.symbol}"><header><b>${p.name} ${p.symbol}</b><span class="${cls(tone)}">${signed(p.score)}</span></header>
 <div class="focus-price">${fmt(p.last)}<small class="${(p.change_pct||0)>0?'tone-up':(p.change_pct||0)<0?'tone-down':'tone-neutral'}">${signed(p.change_pct||0)}%</small></div>
-<div class="focus-tags">${x.reasons.map(r=>`<i>${r}</i>`).join('')}</div></article>`}).join('');
+<div class="focus-tags">${x.reasons.slice(0,3).map(r=>`<i>${r}</i>`).join('')}</div></article>`}).join('');
 const ft=$('focusTime');if(ft)ft.textContent=`${scored.length} 个品种入池`;}
 function renderDailyPicks(){const el=$('dailyPicks');if(!el||!state.products.length)return;const ps=state.products.filter(p=>p.last!=null&&p.score!=null);
 const strong=[...ps].sort((a,b)=>b.score-a.score).slice(0,3),weak=[...ps].sort((a,b)=>a.score-b.score).slice(0,3);

@@ -153,3 +153,14 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 .focus-tags{display:flex;flex-wrap:wrap;gap:6px}
 .focus-tags i{font-style:normal;font-size:9.5px;padding:2px 8px;border:1px solid var(--line2);border-radius:999px;color:var(--cyan)}
 .essay-more{color:var(--cyan);text-decoration:none;font-size:10px}
+
+/* 封面今日关注卡池（2026-08-14） */
+.cover-focus{position:absolute;z-index:3;right:clamp(20px,4.5vw,84px);top:50%;transform:translateY(-50%);width:min(430px,34vw)}
+.cover-focus-title{font-size:12px;letter-spacing:.12em;color:var(--cyan);margin-bottom:8px}
+.cover-focus-title em{font-style:normal;color:var(--muted);font-size:10px;margin-left:8px}
+.cover-focus-pool{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cover-focus .focus-card{padding:12px 14px;background:rgba(8,22,27,.72);backdrop-filter:blur(6px)}
+.cover-focus .focus-card header b{font-size:12.5px}
+.cover-focus .focus-price{font-size:16px;margin:5px 0 4px}
+.cover-focus .focus-tags i{font-size:8.5px;padding:1px 6px}
+@media (max-width:900px){.cover-focus{position:static;transform:none;width:auto;margin:16px}.cover-focus-pool{grid-template-columns:1fr}}
