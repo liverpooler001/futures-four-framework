@@ -2,7 +2,9 @@
    后端：scripts/account_server.py（本机 127.0.0.1:8790，公网暴露后改 ACCOUNT_API）。
    离线时按钮置灰提示，不影响行情功能。 */
 
-const ACCOUNT_API = 'http://127.0.0.1:8790';
+const ACCOUNT_API_LOCAL = 'http://127.0.0.1:8790';
+const ACCOUNT_API_REMOTE = 'https://employed-inkjet-sharon-fruit.trycloudflare.com';
+let ACCOUNT_API = ACCOUNT_API_LOCAL;
 const account = { token: localStorage.getItem('yafco_acct_token') || '', name: localStorage.getItem('yafco_acct_name') || '', positions: [], online: true };
 
 async function acctReq(path, body, auth) {
@@ -17,7 +19,9 @@ async function acctReq(path, body, auth) {
 function acctOnline(off) { account.online = !off; const b = $('acctBtn'); if (b) b.title = off ? '账户服务离线（本机服务未启动）' : ''; }
 
 async function acctInit() {
-  try { await fetch(ACCOUNT_API + '/health', { signal: AbortSignal.timeout(3000) }); acctOnline(false); } catch (e) { acctOnline(true); }
+  try { await fetch(ACCOUNT_API_LOCAL + '/health', { signal: AbortSignal.timeout(1500) }); ACCOUNT_API = ACCOUNT_API_LOCAL; }
+  catch (e) { ACCOUNT_API = ACCOUNT_API_REMOTE; }
+  try { await fetch(ACCOUNT_API + '/health', { signal: AbortSignal.timeout(5000) }); acctOnline(false); } catch (e) { acctOnline(true); }
   if (account.token) {
     try { const me = await acctReq('/me', null, true); account.name = me.name; account.positions = me.positions || []; }
     catch (e) { account.token = ''; localStorage.removeItem('yafco_acct_token'); }
