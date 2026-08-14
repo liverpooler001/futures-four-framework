@@ -79,3 +79,30 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 .equity-row{display:grid;grid-template-columns:1fr 52px 76px 76px 76px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}
 .equity-row b{font-size:12px}.equity-row small{display:block;color:var(--muted);font-size:9px}
 .equity-row span{text-align:right}.equity-row span small{margin-left:3px}
+
+/* 持仓分析卡窄栏修复（2026-08-14）：名称不换行、数值不出框 */
+.seat-row{grid-template-columns:minmax(64px,auto) 1fr auto;gap:8px}
+.seat-row b{white-space:nowrap;font-size:11px}
+.seat-row>div{min-width:0}
+.seat-spark{width:64px;height:18px;justify-self:end}
+.seat-row>span{font-size:12px;white-space:nowrap}
+.seat-row>span small{display:block;font-size:9px;color:var(--muted)}
+
+/* 持仓卡两行布局（2026-08-14 再修）：第一行 名称+净值，第二行 全宽走势 */
+.seat-row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"a b" "c c";gap:2px 8px;padding:9px 0}
+.seat-row>div{grid-area:a}
+.seat-row>span{grid-area:b;text-align:right;font-size:13px;white-space:nowrap}
+.seat-row>span small{display:block;font-size:9px;color:var(--muted)}
+.seat-spark{grid-area:c;width:100%;height:22px;justify-self:stretch}
+
+/* 持仓卡最终布局（2026-08-14）：块级两行，不用 grid */
+.seat-row{display:block;padding:8px 0;border-bottom:1px solid var(--line)}
+.seat-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.seat-top b{font-size:12px;white-space:nowrap;color:var(--text)}
+.seat-top span{font-size:13px;text-align:right;white-space:nowrap}
+.seat-top span small{display:inline-block;margin-left:6px;font-size:9px;color:var(--muted)}
+.seat-spark{display:block;width:100%;height:20px;margin-top:4px}
+
+/* 修 flex 误伤：truth-card 直属 div 全部 flex 化导致持仓行横排 */
+.truth-card>#seatRows{display:block}
+.truth-card>.seat-vol{display:block}
