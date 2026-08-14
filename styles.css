@@ -106,3 +106,6 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 /* 修 flex 误伤：truth-card 直属 div 全部 flex 化导致持仓行横排 */
 .truth-card>#seatRows{display:block}
 .truth-card>.seat-vol{display:block}
+
+/* 短线边际（marginal_focus） */
+.mf{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:10.5px;color:var(--amber);font-weight:400}

@@ -398,6 +398,7 @@ def build(workers: int) -> dict[str, Any]:
             "symbol": symbol, "name": product.get("name"), "covered": True,
             "kind": "focus",
             "contradiction": CONTRADICTIONS.get(symbol) or config["contradiction"],
+            "marginal_focus": config.get("marginal_focus"),
             "metrics": [results[item[0]] for item in config["metrics"]],
             "chart_id": CHART_PICK.get(symbol),
             "library_url": f"{LIBRARY}#/c/{config['route']}",
