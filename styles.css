@@ -65,3 +65,17 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 .essay-item small{color:var(--muted);font-size:9px}
 .essay-item b{display:block;font-size:12px;margin:2px 0}
 .essay-item p{font-size:10.5px;color:var(--muted);line-height:1.55}
+
+/* 权益联动折叠卡（2026-08-14） */
+.equity-fold{margin-top:14px}
+.equity-fold summary{display:flex;align-items:center;gap:12px;cursor:pointer;list-style:none}
+.equity-fold summary::-webkit-details-marker{display:none}
+.equity-fold summary span{font:8px Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.equity-fold summary h3{font-size:15px;margin:0}
+.equity-fold summary em{margin-left:auto;font-style:normal;font-size:11px;color:var(--cyan)}
+.equity-fold summary:after{content:"▾";color:var(--muted)}
+.equity-fold[open] summary:after{content:"▴"}
+.equity-spark{width:100%;height:60px;margin:8px 0 4px}
+.equity-row{display:grid;grid-template-columns:1fr 52px 76px 76px 76px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:12px}
+.equity-row b{font-size:12px}.equity-row small{display:block;color:var(--muted);font-size:9px}
+.equity-row span{text-align:right}.equity-row span small{margin-left:3px}
