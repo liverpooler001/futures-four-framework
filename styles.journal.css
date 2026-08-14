@@ -166,3 +166,5 @@ body.theme-journal .news-card p{color:#5c5847}
 body.theme-journal .news-sector{background:#7a9b3d;color:#fff}
 body.theme-journal .news-tag{border-color:#b9c48a;color:#55701b}
 body.theme-journal .news-card footer{color:#b8720d}
+body.theme-journal .seat-row{border-bottom:1px dashed #ddd6ba}
+body.theme-journal .seat-vol{color:#55701b;border-top:2px dashed #b9b089}

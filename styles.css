@@ -46,3 +46,13 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 .news-card h4{margin:8px 0 6px;font-size:14px;color:var(--text)}
 .news-card p{font-size:11px;color:var(--muted);line-height:1.6}
 .news-card footer{margin-top:8px;font-size:9.5px;color:var(--cyan)}
+
+/* 持仓分析卡（2026-08-13） */
+.seat-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.seat-row b{font-size:12px;color:var(--text)}
+.seat-row small{display:block;color:var(--muted);font-size:9px}
+.seat-row span{text-align:right;font-size:13px}
+.seat-spark{width:84px;height:20px}
+.seat-vol{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line);font-size:10.5px;color:var(--cyan)}
+.seat-note{margin-top:8px;font-size:9px;color:var(--muted)}
+.seat-empty{padding:10px 0;color:var(--muted);font-size:11px}
