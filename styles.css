@@ -120,3 +120,20 @@ main{position:relative;background:radial-gradient(circle at 50% 0,#0b2027 0,#061
 .essay-fold summary:after{content:"▾";color:var(--muted)}
 .essay-fold[open] summary:after{content:"▴"}
 .essay-fold .essay-item{margin-top:8px}
+
+/* 折叠重排（2026-08-14）：四框架明细 + 航线 */
+.framework-fold{margin-top:14px}
+.framework-fold summary,.route-fold summary{display:flex;flex-wrap:wrap;align-items:center;gap:10px;cursor:pointer;list-style:none}
+.framework-fold summary::-webkit-details-marker,.route-fold summary::-webkit-details-marker{display:none}
+.framework-fold summary>span{font:8px Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.framework-fold summary h3{font-size:15px;margin:0}
+.fw-sum{margin-left:auto;font-style:normal;font-size:10px;display:flex;gap:10px;color:var(--muted)}
+.fw-sum i{font-style:normal}.fw-sum b{margin-left:2px}
+.framework-fold summary:after,.route-fold summary:after{content:"▾";color:var(--muted)}
+.framework-fold[open] summary:after,.route-fold[open] summary:after{content:"▴"}
+.framework-fold .framework-grid{margin-top:12px}
+.route-tag{font:8px Consolas,monospace;letter-spacing:.14em;color:var(--muted)}
+.route-pri{font-size:10px;margin-left:auto}
+.route-fold h3{width:100%;margin:6px 0 4px}
+.route-fold summary p{width:100%;margin:4px 0 0}
+.route-fold dl,.route-fold small{display:block;margin-top:10px}
