@@ -129,7 +129,7 @@ def main() -> None:
             continue
         if any(neg in full for neg in NEGATIVE) and len(full) < 60:
             continue
-        summary = full[:140] + ("…" if len(full) > 140 else "")
+        summary = full[:400] + ("…" if len(full) > 400 else "")
         matched.append({
             "date": t["create_time"][:10],
             "sector": "星球纪要", "tag": "/".join(syms[:3]),
